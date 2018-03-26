@@ -1,3 +1,11 @@
 <resources>
+    <!-- General app strings -->
     <string name="app_name">LetMePass</string>
+    <string name="app_logo">*</string>
+    <string name="app_version">0.1.0</string>
+
+    <!-- Screen: intro -->
+    <string name="intro_new">New Database</string>
+    <string name="intro_load_cloud">Open from Cloud</string>
+    <string name="intro_load_device">Open from Device</string>
 </resources>
