@@ -5,11 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.widget.Toast;
 
 import uk.co.davidbaxter.letmepass.R;
@@ -23,6 +19,10 @@ public class IntroActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Setup the layout using the data binding utility library: this allows for binding the
+        // viewmodel, so that buttons etc. in the layout can invoke viewmodel methods, and fields
+        // (such as text fields) can be bound to the viewmodel
         ActivityIntroBinding binding = DataBindingUtil.setContentView(
                 this,
                 R.layout.activity_intro);
@@ -30,6 +30,9 @@ public class IntroActivity extends AppCompatActivity {
         // Setup viewmodel
         this.viewModel = ViewModelProviders.of(this).get(IntroViewModel.class);
         binding.setViewModel(this.viewModel);
+
+        // Setup viewmodel events
+        this.setupEvents();
     }
 
     private void setupEvents() {

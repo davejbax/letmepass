@@ -3,12 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Data bindings -->
     <data>
         <variable
             name="viewModel"
             type="uk.co.davidbaxter.letmepass.presentation.IntroViewModel" />
     </data>
 
+    <!-- Use ConstraintLayout for device support -->
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -16,7 +18,7 @@
         tools:context="uk.co.davidbaxter.letmepass.ui.IntroActivity">
 
         <TextView
-            android:id="@+id/textView7"
+            android:id="@+id/textAppName"
             android:layout_width="wrap_content"
             android:layout_height="47dp"
             android:layout_marginBottom="8dp"
@@ -24,78 +26,72 @@
             android:text="@string/app_name"
             android:textSize="35sp"
             android:typeface="monospace"
-            app:layout_constraintBottom_toTopOf="@+id/textView8"
+            app:layout_constraintBottom_toTopOf="@+id/textAppVersion"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.502"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+            app:layout_constraintTop_toBottomOf="@+id/imgLogo" />
 
         <TextView
-            android:id="@+id/textView8"
+            android:id="@+id/textAppVersion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
             android:text="@string/app_version"
-            app:layout_constraintBottom_toTopOf="@+id/button"
+            app:layout_constraintBottom_toTopOf="@+id/btnNewDatabase"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.501"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView7" />
+            app:layout_constraintTop_toBottomOf="@+id/textAppName" />
 
         <Button
-            android:id="@+id/button"
-            style="@style/AppTheme.MaterialButton"
+            android:id="@+id/btnNewDatabase"
             android:layout_width="320dp"
-            android:layout_height="50dp"
+            android:layout_height="55dp"
             android:layout_marginBottom="16dp"
-            android:background="@color/colorAccent"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:text="@string/intro_new"
             android:onClick="@{() -> viewModel.onNewDatabase()}"
+            android:text="@string/intro_new"
+            android:theme="@style/AppTheme.Button.Primary"
 
-            app:layout_constraintBottom_toTopOf="@+id/button2"
+            app:layout_constraintBottom_toTopOf="@+id/btnLoadCloud"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.503"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView8" />
+            app:layout_constraintTop_toBottomOf="@+id/textAppVersion" />
 
         <Button
-            android:id="@+id/button2"
-            style="@style/AppTheme.MaterialButton"
+            android:id="@+id/btnLoadCloud"
             android:layout_width="320dp"
-            android:layout_height="50dp"
+            android:layout_height="55dp"
             android:layout_marginBottom="16dp"
-            android:background="@color/colorPrimary"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:text="@string/intro_load_cloud"
             android:onClick="@{() -> viewModel.onLoadCloud()}"
-
-            app:layout_constraintBottom_toTopOf="@+id/button3"
+            android:text="@string/intro_load_cloud"
+            android:theme="@style/AppTheme.Button.Accent"
+            
+            app:layout_constraintBottom_toTopOf="@+id/btnLoadDevice"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.503"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button" />
+            app:layout_constraintTop_toBottomOf="@+id/btnNewDatabase" />
 
         <Button
-            android:id="@+id/button3"
-            style="@style/AppTheme.MaterialButton"
+            android:id="@+id/btnLoadDevice"
             android:layout_width="320dp"
-            android:layout_height="50dp"
-            android:background="@color/colorPrimary"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:text="@string/intro_load_device"
+            android:layout_height="55dp"
             android:onClick="@{() -> viewModel.onLoadDevice()}"
+            android:text="@string/intro_load_device"
+            android:theme="@style/AppTheme.Button.Accent"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button2" />
+            app:layout_constraintTop_toBottomOf="@+id/btnLoadCloud" />
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/imgLogo"
             android:layout_width="90dp"
             android:layout_height="90dp"
-            app:layout_constraintBottom_toTopOf="@+id/textView7"
+            app:layout_constraintBottom_toTopOf="@+id/textAppName"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
