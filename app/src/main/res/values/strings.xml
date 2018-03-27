@@ -8,4 +8,13 @@
     <string name="intro_new">New Database</string>
     <string name="intro_load_cloud">Open from Cloud</string>
     <string name="intro_load_device">Open from Device</string>
+
+    <!-- Screen: decryption -->
+    <string name="decryption_label">Decrypt Database</string>
+    <string name="decryption_instruction">
+        Please enter the password to decrypt your database and access your passwords.
+    </string>
+    <string name="decryption_password_hint">Enter password</string>
+    <string name="decryption_use_keyfile">This database needs a keyfile</string>
+    <string name="decryption_decrypt">Decrypt</string>
 </resources>
