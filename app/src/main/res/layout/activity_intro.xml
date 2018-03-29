@@ -51,7 +51,7 @@
             android:layout_marginBottom="16dp"
             android:onClick="@{() -> viewModel.onNewDatabase()}"
             android:text="@string/intro_new"
-            android:theme="@style/AppTheme.Button.Primary"
+            style="@style/Widget.AppCompat.Button.Colored"
 
             app:layout_constraintBottom_toTopOf="@+id/btnLoadCloud"
             app:layout_constraintEnd_toEndOf="parent"
@@ -67,6 +67,7 @@
             android:onClick="@{() -> viewModel.onLoadCloud()}"
             android:text="@string/intro_load_cloud"
             android:theme="@style/AppTheme.Button.Accent"
+            style="@style/Widget.AppCompat.Button.Colored"
             
             app:layout_constraintBottom_toTopOf="@+id/btnLoadDevice"
             app:layout_constraintEnd_toEndOf="parent"
@@ -81,6 +82,7 @@
             android:onClick="@{() -> viewModel.onLoadDevice()}"
             android:text="@string/intro_load_device"
             android:theme="@style/AppTheme.Button.Accent"
+            style="@style/Widget.AppCompat.Button.Colored"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

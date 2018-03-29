@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorButtonNormal">@color/colorDisabled</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -28,16 +29,12 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
-    <!-- 'Primary' button, which uses accent color: must contrast other colors to stand out! -->
-    <style name="AppTheme.Button.Primary"
-        parent="Widget.AppCompat.Button.Colored">
-        <item name="colorButtonNormal">@color/colorAccent</item>
-        <item name="android:textColor">@color/white</item>
-    </style>
-
-    <!-- 'Accent' button, which uses primary color: must contrast other colors to stand out! -->
+    <!-- 'Accent' button, which uses primary color: note that buttons use colorAccent so as to
+         contrast the primary color. This button sets the 'colorAccent' to the primary color, and
+         should be used for 'other' buttons, where they must be distinguished from the regular
+         buttons. -->
     <style name="AppTheme.Button.Accent"
-        parent="Widget.AppCompat.Button.Colored">
-        <item name="colorButtonNormal">@color/colorPrimary</item>
+        parent="ThemeOverlay.AppCompat.Dark">
+        <item name="colorAccent">@color/colorPrimary</item>
     </style>
 </resources>
