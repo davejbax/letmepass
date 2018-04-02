@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="uk.co.davidbaxter.letmepass.presentation.CreationViewModel" />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/view_padding"
+            tools:context=".ui.CreationStep2Fragment">
+
+            <TextView
+                android:id="@+id/textCreationStep2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/creation_step2"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/editLayoutMpCreation"
+                android:layout_width="284dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                app:passwordToggleEnabled="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textCreationStep2">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/editMpCreation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/creation_mp_hint"
+                    android:inputType="textPassword"
+                    android:onTextChanged="@{viewModel.onMpChanged}"
+                    android:text="@={viewModel.masterPassword}" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <TextView
+                android:id="@+id/textPwdFlagsTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="@string/creation_flags_explanation"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editLayoutMpCreation" />
+
+            <include
+                android:id="@+id/incPwdFlags"
+                layout="@layout/component_pwd_flags"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textPwdFlagsTitle"
+                app:layout_constraintVertical_bias="0.0"
+                app:passwordFlags="@{viewModel.passwordFlags}" />
+
+            <Button
+                android:id="@+id/btnBreachCheck"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="180dp"
+                android:layout_height="56dp"
+                android:layout_marginTop="8dp"
+                android:onClick="@{() -> viewModel.onBreachCheck()}"
+                android:text="@string/creation_breach_check"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/incPwdFlags"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <ImageButton
+                android:id="@+id/btnBreachCheckHelp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:background="?android:selectableItemBackground"
+                android:tint="@color/colorDisabled"
+                android:onClick="@{() -> viewModel.onBreachCheckHelp() }"
+                app:layout_constraintBottom_toBottomOf="@+id/btnBreachCheck"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/btnBreachCheck"
+                app:layout_constraintTop_toTopOf="@+id/btnBreachCheck"
+                app:srcCompat="@drawable/ic_help_black_24dp" />
+
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
+
+</layout>

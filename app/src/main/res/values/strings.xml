@@ -17,4 +17,51 @@
     <string name="decryption_password_hint">Enter password</string>
     <string name="decryption_use_keyfile">This database needs a keyfile</string>
     <string name="decryption_decrypt">Decrypt</string>
+
+    <!-- Screen: creation -->
+    <string name="creation_label">Create New Database</string>
+    <string name="creation_step1">
+        Please choose the desired location of the password database.
+    </string>
+    <string name="creation_step2">
+        Please enter a master password.\n\n<b>This password will be used to protect all of your
+        other passwords,</b> so it should be strong.
+    </string>
+    <string name="creation_step3">
+        <b>Recommended for advanced users only.</b>\nYou may wish to add a key file to add an extra
+        layer of security to the database. Please note that if this key file is lost, <b>all data
+        will be lost</b>.
+    </string>
+    <string name="creation_step4">
+        Finally, please re-enter the master password to ensure that it was entered correctly.
+    </string>
+    <string name="creation_choose_cloud">Cloud storage with Google Drive</string>
+    <string name="creation_choose_device">Device storage</string>
+    <string name="creation_open_file">Choose file</string>
+    <string name="creation_location">Location: %1$s</string>
+    <string name="creation_location_null">none selected</string>
+    <string name="creation_step_title">Step %1$d</string>
+    <string name="creation_flags_explanation">Security recommendation:</string>
+    <string name="creation_mp_hint">Master password</string>
+    <string name="creation_breach_check">Check Breaches</string>
+    <string name="creation_gen_keyfile">Generate Keyfile</string>
+    <string name="creation_keyfile_continue">
+        If you do not wish to create a keyfile, tap \'Next\'
+        to continue.
+    </string>
+    <string name="creation_db_name_instruction">
+        Optionally, you may choose a name for this database to identify it. You may also choose
+        whether to load this database automatically when the app is launched.
+    </string>
+    <string name="creation_db_name_hint">Database name</string>
+    <string name="creation_db_is_default">Load this database on app launch</string>
+
+    <!-- Other global strings -->
+    <string name="pwd_flags_good_length">Minimum 12 characters</string>
+    <string name="pwd_flags_has_mixed_chars">Mixed case &amp; Numbers</string>
+    <string name="pwd_flags_has_symbols">Symbols</string>
+    <string name="pwd_flags_not_blacklisted">Unique/uncommon password</string>
+    <!-- TODO: combine these into one, in UML diagrams, class, and strings. -->
+
+
 </resources>

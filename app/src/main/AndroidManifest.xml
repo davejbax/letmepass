@@ -20,9 +20,10 @@
         </activity>
         <activity
             android:name=".ui.DecryptionActivity"
-            android:label="@string/decryption_label">
-
-        </activity>
+            android:label="@string/decryption_label"></activity>
+        <activity
+            android:name=".ui.CreationActivity"
+            android:label="@string/creation_label"></activity>
     </application>
 
 </manifest>

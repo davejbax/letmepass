@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="uk.co.davidbaxter.letmepass.presentation.CreationViewModel" />
+    </data>
+
+    <!--
+    Wrap in a ScrollView to accommodate landscape orientations on phones and other small
+    screened devices
+    -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/view_padding"
+            tools:context=".ui.CreationStep1Fragment">
+
+            <TextView
+                android:id="@+id/textCreationStep1"
+                android:layout_width="0dp"
+                android:layout_height="46dp"
+                android:text="@string/creation_step1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <RadioGroup
+                android:id="@+id/radioGroupLocation"
+                android:layout_width="0dp"
+                android:layout_height="329dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textCreationStep1">
+
+                <RadioButton
+                    android:id="@+id/radioLocationCloud"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="@{() -> viewModel.setCloudChecked(true) }"
+                    android:text="@string/creation_choose_cloud"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+                <TextView
+                    android:id="@+id/textLocationCloudChoice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="34dp"
+                    android:layout_marginStart="34dp"
+                    android:layout_weight="1"
+                    android:text="@{@string/creation_location(viewModel.cloudLocation ?? @string/creation_location_null)}"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+                <Button
+                    android:id="@+id/btnLocationOpenCloud"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="180dp"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginLeft="32dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_weight="1"
+                    android:enabled="@{viewModel.cloudChecked}"
+                    android:onClick="@{() -> viewModel.onOpenCloud() }"
+                    android:text="@string/creation_open_file" />
+
+                <RadioButton
+                    android:id="@+id/radioLocationDevice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="@{() -> viewModel.setCloudChecked(false) }"
+                    android:text="@string/creation_choose_device"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+                <TextView
+                    android:id="@+id/textLocationDeviceChoice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="34dp"
+                    android:layout_marginStart="34dp"
+                    android:layout_weight="1"
+                    android:text="@{@string/creation_location(viewModel.deviceLocation ?? @string/creation_location_null)}"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+                <Button
+                    android:id="@+id/btnLocationOpenDevice"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="180dp"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginLeft="32dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_weight="1"
+                    android:enabled="@{!viewModel.cloudChecked}"
+                    android:onClick="@{() -> viewModel.onOpenDevice() }"
+                    android:text="@string/creation_open_file" />
+
+            </RadioGroup>
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
+
+</layout>

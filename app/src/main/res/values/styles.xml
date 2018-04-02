@@ -7,17 +7,10 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorButtonNormal">@color/colorDisabled</item>
+        <item name="ms_stepperStyle">@style/StepperStyle</item>
     </style>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
+    <!-- Theme for 'intro' screen -->
     <style name="AppTheme.Intro">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -36,5 +29,11 @@
     <style name="AppTheme.Button.Accent"
         parent="ThemeOverlay.AppCompat.Dark">
         <item name="colorAccent">@color/colorPrimary</item>
+    </style>
+
+    <!-- 'Stepper' style, for step-by-step activities using a stepper -->
+    <style name="StepperStyle">
+        <item name="ms_activeStepColor">@color/colorAccent</item>
+        <item name="ms_inactiveStepColor">@color/colorDisabled</item>
     </style>
 </resources>

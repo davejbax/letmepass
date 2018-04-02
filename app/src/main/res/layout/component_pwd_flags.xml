@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Component: password flags
+This component provides a layout for a series of password flags, using data binding to update the
+flags as displayed. This layout provide a visual indication and explanation as to which criteria
+('flags') a password satisfies.
+Note that this component requires a password flags variable, so that this data binding can occur.
+-->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <!-- TODO: change this placeholder type -->
+        <variable
+            name="passwordFlags"
+            type="uk.co.davidbaxter.letmepass.presentation.CreationViewModel.DummyPasswordFlagsClass" />
+    </data>
+
+    <!-- Wrap in TableLayout so that columns are ticks/crosses and text, and rows are the different
+    password flags -->
+    <TableLayout
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical">
+            <ImageView
+                android:id="@+id/imgFlagGoodLength"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:tint="@{passwordFlags.goodLength ? @color/colorAccent : @color/colorPrimary}"
+                android:src="@{passwordFlags.goodLength ? @drawable/ic_done_black_24dp : @drawable/ic_close_black_24dp}" />
+
+            <TextView
+                android:id="@+id/txtFlagGoodLength"
+                android:layout_height="wrap_content"
+                android:text="@string/pwd_flags_good_length"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                tools:layout_editor_absoluteX="64dp"
+                tools:layout_editor_absoluteY="266dp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/imgFlagHasMixedChars"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:src="@{passwordFlags.hasMixedChars ? @drawable/ic_done_black_24dp : @drawable/ic_close_black_24dp}"
+                android:tint="@{passwordFlags.hasMixedChars ? @color/colorAccent : @color/colorPrimary}" />
+
+            <TextView
+                android:id="@+id/txtFlagHasMixedChars"
+                android:layout_height="wrap_content"
+                android:text="@string/pwd_flags_has_mixed_chars"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/imgFlagHasSymbols"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:src="@{passwordFlags.hasSymbols ? @drawable/ic_done_black_24dp : @drawable/ic_close_black_24dp}"
+                android:tint="@{passwordFlags.hasSymbols ? @color/colorAccent : @color/colorPrimary}" />
+
+            <TextView
+                android:id="@+id/txtFlagHasSymbols"
+                android:layout_height="wrap_content"
+                android:text="@string/pwd_flags_has_symbols"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/imgFlagNotBlacklisted"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:src="@{passwordFlags.notBlacklisted ? @drawable/ic_done_black_24dp : @drawable/ic_close_black_24dp}"
+                android:tint="@{passwordFlags.notBlacklisted ? @color/colorAccent : @color/colorPrimary}" />
+
+            <TextView
+                android:id="@+id/txtFlagNotBlacklisted"
+                android:layout_height="wrap_content"
+                android:text="@string/pwd_flags_not_blacklisted"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+        </TableRow>
+    </TableLayout>
+</layout>
