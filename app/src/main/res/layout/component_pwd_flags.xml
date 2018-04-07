@@ -36,7 +36,7 @@ Note that this component requires a password flags variable, so that this data b
                 android:src="@{passwordFlags.goodLength ? @drawable/ic_done_black_24dp : @drawable/ic_close_black_24dp}" />
 
             <TextView
-                android:id="@+id/txtFlagGoodLength"
+                android:id="@+id/textFlagGoodLength"
                 android:layout_height="wrap_content"
                 android:text="@string/pwd_flags_good_length"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
@@ -58,7 +58,7 @@ Note that this component requires a password flags variable, so that this data b
                 android:tint="@{passwordFlags.hasMixedChars ? @color/colorAccent : @color/colorPrimary}" />
 
             <TextView
-                android:id="@+id/txtFlagHasMixedChars"
+                android:id="@+id/textFlagHasMixedChars"
                 android:layout_height="wrap_content"
                 android:text="@string/pwd_flags_has_mixed_chars"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small" />
@@ -78,7 +78,7 @@ Note that this component requires a password flags variable, so that this data b
                 android:tint="@{passwordFlags.hasSymbols ? @color/colorAccent : @color/colorPrimary}" />
 
             <TextView
-                android:id="@+id/txtFlagHasSymbols"
+                android:id="@+id/textFlagHasSymbols"
                 android:layout_height="wrap_content"
                 android:text="@string/pwd_flags_has_symbols"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small" />
@@ -98,7 +98,7 @@ Note that this component requires a password flags variable, so that this data b
                 android:tint="@{passwordFlags.notBlacklisted ? @color/colorAccent : @color/colorPrimary}" />
 
             <TextView
-                android:id="@+id/txtFlagNotBlacklisted"
+                android:id="@+id/textFlagNotBlacklisted"
                 android:layout_height="wrap_content"
                 android:text="@string/pwd_flags_not_blacklisted"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small" />
