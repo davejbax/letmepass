@@ -20,7 +20,7 @@ public class CreationActivity extends AppCompatActivity {
 
     private void setupStepper() {
         // Create new step adapter to handle creating step fragments, and set this in our view
-        StepperLayout stepper = (StepperLayout) findViewById(R.id.creation_stepper);
+        StepperLayout stepper = (StepperLayout) findViewById(R.id.creationStepper);
         stepper.setAdapter(new CreationStepAdapter(
                 getSupportFragmentManager(),
                 this));

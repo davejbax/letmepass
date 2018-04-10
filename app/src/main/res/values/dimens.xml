@@ -1,4 +1,5 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="view_padding">16dp</dimen>
+    <dimen name="view_padding_negative">-16dp</dimen>
 </resources>
