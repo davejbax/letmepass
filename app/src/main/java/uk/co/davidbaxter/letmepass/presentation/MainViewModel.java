@@ -228,6 +228,12 @@ public class MainViewModel extends ViewModel {
                             R.string.main_divider_passwords));
                 containers.addAll(others);
 
+                // Add an empty divider below everything to make room for FAB
+                if (input.size() > 1) {
+                    containers.add(new PasswordDatabaseEntryContainer(R.string.empty_string));
+                    containers.add(new PasswordDatabaseEntryContainer(R.string.empty_string));
+                }
+
                 return containers;
             }
 

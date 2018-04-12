@@ -1,6 +1,7 @@
 package uk.co.davidbaxter.letmepass.presentation;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 
 import uk.co.davidbaxter.letmepass.R;
@@ -59,6 +60,18 @@ public class MainEntryCallbacks {
      * @param container Container of entry
      */
     public void onDeleteEntry(PasswordDatabaseEntryContainer container) {
+        // TODO
+    }
+
+    public void onNewFolder() {
+        // TODO
+    }
+
+    public void onNewData() {
+        // TODO
+    }
+
+    public void onNewPassword() {
         // TODO
     }
 

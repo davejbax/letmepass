@@ -3,6 +3,7 @@
     <string name="app_name">LetMePass</string>
     <string name="app_logo">*</string>
     <string name="app_version">0.1.0</string>
+    <string name="empty_string"></string>
 
     <!-- Screen: intro -->
     <string name="intro_new">New Database</string>

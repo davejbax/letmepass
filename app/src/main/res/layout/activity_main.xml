@@ -36,18 +36,61 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-            <!-- Recycler view, displaying password entries etc. -->
+            <!-- Sticky divider -->
             <include
                 android:id="@+id/stickyDividerMain"
                 layout="@layout/component_sticky_divider"
                 app:viewModel="@{viewModel}" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recyclerMain"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scrollbars="vertical"
-                android:layout_marginTop="@dimen/main_divider_height_negative" />
+                android:layout_height="match_parent">
+                <!-- Recycler view, displaying password entries etc. -->
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerMain"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="vertical"
+                    android:layout_marginTop="@dimen/main_divider_height_negative" />
+
+                <!-- Floating action button to add new entries -->
+                <com.getbase.floatingactionbutton.FloatingActionsMenu
+                    android:id="@+id/fabMenuMain"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|bottom"
+                    android:layout_margin="@dimen/fab_margin"
+                    app:fab_addButtonColorNormal="@color/colorAccent"
+                    app:fab_addButtonColorPressed="@color/colorAccent"
+                    app:fab_addButtonPlusIconColor="@color/white"
+                    app:fab_addButtonSize="normal">
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="@{() -> viewModel.getEntryCallbacks().onNewFolder()}"
+                        app:fab_colorNormal="@color/colorAccentDark"
+                        app:fab_colorPressed="@color/colorAccentDark"
+                        app:fab_size="mini"
+                        app:fab_icon="@drawable/ic_folder_white_24dp" />
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="@{() -> viewModel.getEntryCallbacks().onNewData()}"
+                        app:fab_colorNormal="@color/colorAccentDark"
+                        app:fab_colorPressed="@color/colorAccentDark"
+                        app:fab_size="mini"
+                        app:fab_icon="@drawable/ic_insert_drive_file_white_24dp" />
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="@{() -> viewModel.getEntryCallbacks().onNewPassword()}"
+                        app:fab_colorNormal="@color/colorAccentDark"
+                        app:fab_colorPressed="@color/colorAccentDark"
+                        app:fab_size="mini"
+                        app:fab_icon="@drawable/ic_vpn_key_white_24dp" />
+                </com.getbase.floatingactionbutton.FloatingActionsMenu>
+            </FrameLayout>
+
 
         </LinearLayout>
 
