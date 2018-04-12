@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!--
+    Password view-changing items: these are 'checkable', i.e. they can be selected and switched
+    between, and are logically related; however, only a single item can be selected at once
+    -->
+    <group
+        android:id="@+id/groupViewChangers"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/itemExplore"
+            android:icon="@drawable/ic_home_black_24dp"
+            android:title="@string/main_nav_explore"
+            android:checked="true" />
+        <item
+            android:id="@+id/itemFavorites"
+            android:icon="@drawable/ic_star_black_24dp"
+            android:title="@string/main_nav_favorites" />
+        <item
+            android:id="@+id/itemAllPasswords"
+            android:icon="@drawable/ic_view_list_black_24dp"
+            android:title="@string/main_nav_all_passwords" />
+    </group>
+
+    <!--
+    Group of activity-changing items: these launch a separate activity when clicked, and hence are
+    kept separate from the rest, and are not 'checkable'.
+    -->
+    <group
+        android:id="@+id/groupActivityChangers"
+        android:checkableBehavior="none">
+        <item
+            android:id="@+id/itemConfigure"
+            android:icon="@drawable/ic_build_black_24dp"
+            android:title="@string/main_nav_configure" />
+        <item
+            android:id="@+id/itemClose"
+            android:icon="@drawable/ic_exit_to_app_black_24dp"
+            android:title="@string/main_nav_close" />
+    </group>
+
+</menu>

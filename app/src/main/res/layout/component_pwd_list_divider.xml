@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="uk.co.davidbaxter.letmepass.presentation.MainViewModel" />
+        <variable
+            name="entryContainer"
+            type="uk.co.davidbaxter.letmepass.presentation.PasswordDatabaseEntryContainer" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/main_divider_height"
+        android:paddingBottom="8dp"
+        android:paddingLeft="@dimen/view_padding"
+        android:paddingRight="@dimen/view_padding"
+        android:paddingTop="8dp">
+
+        <TextView
+            android:id="@+id/textEntryTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{context.getString(entryContainer.getDividerStringId())}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</layout>

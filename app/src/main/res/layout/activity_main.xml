@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="uk.co.davidbaxter.letmepass.presentation.MainViewModel" />
+    </data>
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawerLayoutMain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <!--
+        Container for main screen contents; must be nested within the DrawerLayout so that
+        navigation drawer can be drawn over the contents (it 'slides' out).
+        -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@color/colorLightBg">
+
+            <!-- Action bar -->
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbarMain"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                android:elevation="4dp"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:layout_constraintTop_toTopOf="parent"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+            <!-- Recycler view, displaying password entries etc. -->
+            <include
+                android:id="@+id/stickyDividerMain"
+                layout="@layout/component_sticky_divider"
+                app:viewModel="@{viewModel}" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerMain"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical"
+                android:layout_marginTop="@dimen/main_divider_height_negative" />
+
+        </LinearLayout>
+
+        <!-- Container for navigation drawer contents; items are added programmatically -->
+        <android.support.design.widget.NavigationView
+            android:id="@+id/navMain"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            android:layout_gravity="start"
+            app:menu="@menu/menu_main_drawer" />
+
+    </android.support.v4.widget.DrawerLayout>
+
+</layout>

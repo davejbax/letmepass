@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/itemToggleFavorite"
+        android:title="@string/main_popup_favorite" />
+    <item
+        android:id="@+id/itemEditEntry"
+        android:title="@string/main_popup_edit" />
+    <item
+        android:id="@+id/itemDeleteEntry"
+        android:title="@string/main_popup_delete" />
+
+</menu>

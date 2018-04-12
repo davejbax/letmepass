@@ -8,6 +8,13 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorButtonNormal">@color/colorDisabled</item>
         <item name="ms_stepperStyle">@style/StepperStyle</item>
+        <item name="popupMenuStyle">@style/PopupMenuStyle</item>
+    </style>
+
+    <!-- 'No action bar' theme so that action bar can be set programmatically when necessary -->
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
     <!-- Theme for 'intro' screen -->
@@ -35,5 +42,12 @@
     <style name="StepperStyle">
         <item name="ms_activeStepColor">@color/colorAccent</item>
         <item name="ms_inactiveStepColor">@color/colorDisabled</item>
+    </style>
+
+    <!-- Popup menu style, mainly for overflow buttons. We set offsets so the menu isn't on the
+         edge of the screen -->
+    <style name="PopupMenuStyle" parent="@style/Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:dropDownHorizontalOffset">@dimen/view_padding_negative</item>
+        <item name="android:dropDownVerticalOffset">@dimen/view_padding</item>
     </style>
 </resources>

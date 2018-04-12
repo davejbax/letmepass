@@ -56,6 +56,42 @@
     <string name="creation_db_name_hint">Database name</string>
     <string name="creation_db_is_default">Load this database on app launch</string>
 
+    <!-- Main screen strings -->
+    <string name="main_label">Passwords</string>
+    <string name="main_title_explore">Passwords</string>
+    <string name="main_title_favorites">Favourites</string>
+    <string name="main_title_all_passwords">All Passwords</string>
+    <string name="main_title_search_results">Results for \'%1$s\'</string>
+    <string name="main_divider_empty">No passwords</string>
+    <string name="main_divider_folders">Folders</string>
+    <string name="main_divider_passwords">Passwords</string>
+    <string name="main_entry_subtitle_folder">%1$s</string><!-- password plural inc. count (e.g. '4 passwords') -->
+    <string name="main_entry_subtitle_password">Username: %1$s</string><!-- username -->
+    <string name="main_entry_subtitle_data">Text data</string>
+    <string name="main_entry_subtitle_sorted"><b>%1$s</b>: %2$s</string><!-- sorting label, value -->
+    <string name="main_entry_subtitle_fav">\u2605 / %1$s</string><!-- show a star next to subtitle -->
+
+    <!-- Main screen: search -->
+    <string name="main_search_title">Search Passwords</string>
+    <string name="main_search_hint">Password name/description</string>
+
+    <!-- Main screen: navigation menu -->
+    <string name="main_nav_explore">Explore Passwords</string>
+    <string name="main_nav_favorites">Favourites</string><!-- American spelling conventional -->
+    <string name="main_nav_all_passwords">All Passwords</string>
+    <string name="main_nav_configure">Configure Database</string>
+    <string name="main_nav_close">Close Database</string>
+
+    <!-- Main screen: popup menu (for entries) -->
+    <string name="main_popup_favorite">Toggle favourite</string>
+    <string name="main_popup_edit">Edit entry</string>
+    <string name="main_popup_delete">Delete entry</string>
+
+    <!-- Main screen: sorting -->
+    <string name="main_sort_name">Name</string>
+    <string name="main_sort_created">Created</string>
+    <string name="main_sort_updated">Updated</string>
+
     <!-- Other global strings -->
     <string name="pwd_flags_good_length">Minimum 12 characters</string>
     <string name="pwd_flags_has_mixed_chars">Mixed case &amp; Numbers</string>

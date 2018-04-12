@@ -2,4 +2,6 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="view_padding">16dp</dimen>
     <dimen name="view_padding_negative">-16dp</dimen>
+    <dimen name="main_divider_height">48dp</dimen>
+    <dimen name="main_divider_height_negative">-48dp</dimen>
 </resources>

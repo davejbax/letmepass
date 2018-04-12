@@ -5,6 +5,7 @@
     <color name="colorPrimaryDark">#9a0007</color>
     <color name="colorAccent">#00796b</color>
     <color name="colorDisabled">#6b6b6b</color>
+    <color name="colorLightBg">#e2e2e2</color>
 
     <!-- Secondary/darker color scheme -->
     <color name="colorNight">#141414</color>

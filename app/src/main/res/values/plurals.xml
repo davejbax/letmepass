@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="passwords">
+        <item quantity="zero">%d passwords</item>
+        <item quantity="one">%d password</item>
+        <item quantity="other">%d passwords</item>
+    </plurals>
+</resources>
