@@ -50,9 +50,14 @@ public class MainActivity extends AppCompatActivity implements
 
     private MainViewModel viewModel;
 
+    private boolean largeScreen;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set whether we are a large screen/device or not
+        this.largeScreen = getResources().getBoolean(R.bool.large_layout);
 
         // Get viewmodel
         this.viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
@@ -350,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements
                 EntryDialogFragment dialogFragment = new EntryDialogFragment();
                 dialogFragment.setArguments(args);
 
-                if (/* isLargeLayout */true) { // TODO
+                if (!largeScreen) { // Show as fullscreen if we are a small screen
                     getSupportFragmentManager()
                             .beginTransaction()
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
