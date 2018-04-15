@@ -10,6 +10,7 @@ import java.text.DateFormat;
 import java.util.Date;
 
 import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
+import uk.co.davidbaxter.letmepass.model.PasswordEntry;
 import uk.co.davidbaxter.letmepass.util.SingleLiveEvent;
 
 /**
@@ -43,6 +44,9 @@ public class EntryDialogViewModel extends ViewModel {
      */
     private MutableLiveData<PasswordDatabaseEntry> workingEntry = new MutableLiveData<>();
 
+    private MutableLiveData<CreationViewModel.DummyPasswordFlagsClass> passwordFlags =
+            new MutableLiveData<>();
+
     /**
      * Container holding the original entry to be edited. The entry held in this container need not
      * correspond to the exact entry held in the model, but it should be noted that observers that
@@ -63,6 +67,13 @@ public class EntryDialogViewModel extends ViewModel {
         this.editable.setValue(editable);
         this.container = container;
         this.workingEntry.setValue((PasswordDatabaseEntry) container.getEntry().clone());
+        this.passwordFlags.setValue(new CreationViewModel.DummyPasswordFlagsClass());
+
+        // Initialize password flags for the current password
+        if (container.getEntry().getType().equals(PasswordEntry.TYPE))
+            this.passwordFlags.getValue().recalculate(
+                    ((PasswordEntry) container.getEntry()).password
+            );
     }
 
     /**
@@ -101,6 +112,10 @@ public class EntryDialogViewModel extends ViewModel {
         return this.workingEntry;
     }
 
+    public LiveData<CreationViewModel.DummyPasswordFlagsClass> getPasswordFlags() {
+        return this.passwordFlags;
+    }
+
     /**
      * Gets the icon resource ID for the entry being edited
      * @return Icon drawable resource ID
@@ -119,6 +134,19 @@ public class EntryDialogViewModel extends ViewModel {
     public String formatDate(long dateMillis) {
         Date date = new Date(dateMillis);
         return format.format(date);
+    }
+
+    public void onPasswordChanged(CharSequence newPassword, int start, int before, int count) {
+        // Retrieve or create flags
+        CreationViewModel.DummyPasswordFlagsClass flags = passwordFlags.getValue();
+        if (flags == null)
+            flags = new CreationViewModel.DummyPasswordFlagsClass();
+
+        // Get password and recalculate flags based on it
+        flags.recalculate(newPassword.toString());
+
+        // Update flags in view
+        passwordFlags.postValue(flags);
     }
 
     /**

@@ -56,46 +56,56 @@ public class CreationViewModel extends ViewModel {
         if (pwdFlags == null)
             pwdFlags = new DummyPasswordFlagsClass();
 
-        // Working booleans from which to set the password flags
-        boolean numbers = false;
-        boolean upper = false;
-        boolean lower = false;
-        boolean symbols = false;
-
-        // Iterate over characters to check whether containing certain chars
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if ((c >= 32 && c <= 47)
-                    || (c >= 58 && c <= 64)
-                    || (c >= 91 && c <= 96)
-                    || (c >= 123 && c <= 126))
-                symbols = true;
-            if (c >= 97 && c <= 122)
-                lower = true;
-            if (c >= 65 && c <= 90)
-                upper = true;
-            if (c >= 48 && c <= 57)
-                numbers = true;
-        }
-
-        // Set good length
-        pwdFlags.goodLength = s.length() >= 12;
-
-        // Set mixed chars
-        pwdFlags.hasMixedChars = upper && lower && numbers;
-
-        // Set symbols
-        pwdFlags.hasSymbols = symbols;
+        pwdFlags.recalculate(s.toString());
 
         // Re-set passwordFlags LiveData so UI updates
         passwordFlags.setValue(pwdFlags);
     }
 
-    public class DummyPasswordFlagsClass {
+    public static class DummyPasswordFlagsClass {
         public boolean goodLength,
                 hasSymbols,
                 hasMixedChars, // Contains uppercase, lowercase, and numbers
                 notBlacklisted;
+
+        public DummyPasswordFlagsClass() {
+        }
+
+        public final void recalculate(String password) {
+            // Working booleans from which to set the password flags
+            boolean numbers = false;
+            boolean upper = false;
+            boolean lower = false;
+            boolean symbols = false;
+
+            // Iterate over characters to check whether containing certain chars
+            for (int i = 0; i < password.length(); i++) {
+                char c = password.charAt(i);
+                if ((c >= 32 && c <= 47)
+                        || (c >= 58 && c <= 64)
+                        || (c >= 91 && c <= 96)
+                        || (c >= 123 && c <= 126))
+                    symbols = true;
+                if (c >= 97 && c <= 122)
+                    lower = true;
+                if (c >= 65 && c <= 90)
+                    upper = true;
+                if (c >= 48 && c <= 57)
+                    numbers = true;
+            }
+
+            // Set good length
+            this.goodLength = password.length() >= 12;
+
+            // Set mixed chars
+            this.hasMixedChars = upper && lower && numbers;
+
+            // Set symbols
+            this.hasSymbols = symbols;
+
+            // Set blacklisted
+            this.notBlacklisted = true;
+        }
 
         @Override
         public boolean equals(Object other) {

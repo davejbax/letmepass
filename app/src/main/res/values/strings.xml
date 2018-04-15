@@ -123,6 +123,7 @@
     </string>
     <string name="label_entry_data">Data</string>
     <string name="hint_entry_data">Enter text data here</string>
+    <string name="label_entry_flags">Password strength</string>
 
     <!-- Other global strings -->
     <string name="pwd_flags_good_length">Minimum 12 characters</string>
