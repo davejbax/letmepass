@@ -29,12 +29,17 @@ public class MainEntryCallbacks {
         if (container.isDivider())
             return;
 
-        // TODO handle folder clicks
+        // If opening a folder, navigate to it in navigator and refresh title/entries
+        if (container.getEntry().getType().equals(FolderEntry.TYPE)) {
+            this.viewModel.getNavigationCallbacks().onOpenFolder(container);
+        // If any other entry, open dialog to view it
+        } else {
+            this.viewModel.dialog.postValue(new Pair<PasswordDatabaseEntryContainer, Boolean>(
+                    container,
+                    false // Not editable
+            ));
+        }
 
-        this.viewModel.dialog.postValue(new Pair<PasswordDatabaseEntryContainer, Boolean>(
-                container,
-                false // Not editable
-        ));
     }
 
     /**
@@ -102,7 +107,14 @@ public class MainEntryCallbacks {
      */
     public void saveEntry(PasswordDatabaseEntryContainer container) {
         // TODO impl save
-        this.viewModel.model.saveEntry(container.getEntry());
+        if (this.viewModel.navigator.isAtRoot()) {
+            this.viewModel.model.saveEntry(container.getEntry());
+        } else {
+            this.viewModel.model.saveToFolder(
+                    this.viewModel.navigator.getFolder(),
+                    container.getEntry()
+            );
+        }
         // If we are saving an existing entry, then simply update the container
         if (this.viewModel.getContainers().getValue().contains(container)) {
             this.viewModel.updateContainer.postValue(container);

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Stack;
 
 import uk.co.davidbaxter.letmepass.R;
 import uk.co.davidbaxter.letmepass.model.DataEntry;
@@ -56,6 +57,8 @@ public class MainViewModel extends ViewModel {
      */
     final MutableLiveData<Pair<Integer, Object[]>> screenTitle = new MutableLiveData<>();
 
+    final MutableLiveData<Boolean> canGoBack = new MutableLiveData<>();
+
     /**
      * Triplet (LiveData) of the view to bind a popup to, the menu resource ID for the popup menu,
      * and any extra data to pass to the menu -- for instance, containers, if a container menu was
@@ -83,7 +86,9 @@ public class MainViewModel extends ViewModel {
     DisplayMode currentMode = DisplayMode.EXPLORE;
 
     // TODO: replace with real model
-    DummyModel model;
+    DummyModel model = new DummyModel();
+
+    DummyModelNavigator navigator = new DummyModelNavigator(model);
 
     /**
      * List of containers of password entries -- these are transformed from model-returned password
@@ -108,7 +113,6 @@ public class MainViewModel extends ViewModel {
 
 
     public MainViewModel() {
-        this.model = new DummyModel();
         this.sortingCriteria.setValue(SortingCriteria.NAME_ASC);
         this.containers = transformIntoContainers(entries);
         this.entries.postValue(this.model.getEntries());
@@ -155,6 +159,10 @@ public class MainViewModel extends ViewModel {
 
     public LiveData<PasswordDatabaseEntryContainer> getContainerUpdate() {
         return updateContainer;
+    }
+
+    public LiveData<Boolean> getCanGoBack() {
+        return canGoBack;
     }
 
     public MainEntryCallbacks getEntryCallbacks() {
@@ -214,11 +222,13 @@ public class MainViewModel extends ViewModel {
     public void refreshView() {
         switch (this.currentMode) {
             case EXPLORE:
+                int stringId = navigator.isAtRoot() ? R.string.main_title_explore
+                        : R.string.main_title_exploring;
                 this.screenTitle.postValue(new Pair<Integer, Object[]>(
-                        R.string.main_title_explore,
-                        null // No format params
+                        stringId,
+                        new String[] { navigator.getFolderTitle() } // No format params
                 ));
-                this.entries.postValue(this.model.getEntries());
+                this.entries.postValue(this.navigator.getCurrentEntries());
                 break;
 
             case FAVORITES:
@@ -403,8 +413,87 @@ public class MainViewModel extends ViewModel {
             }
         }
 
+        public void saveToFolder(FolderEntry folder, PasswordDatabaseEntry entry) {
+            if (!folder.children.contains(entry))
+                folder.children.add(entry);
+        }
+
         public void deleteEntry(PasswordDatabaseEntry entry) {
-            entries.remove(entry);
+            deleteRecursively(null, entry);
+        }
+
+        private boolean deleteRecursively(FolderEntry folder, PasswordDatabaseEntry target) {
+            List<PasswordDatabaseEntry> entries;
+            if (folder == null)
+                entries = this.entries;
+            else
+                entries = folder.children;
+
+            boolean found = false;
+
+            for (PasswordDatabaseEntry entry : entries) {
+                if (entry == target) {
+                    found = true;
+                    break;
+                } else if (entry.getType().equals(FolderEntry.TYPE)) {
+                    if (deleteRecursively((FolderEntry) entry, target))
+                        return true;
+                }
+            }
+
+            if (found) {
+                if (folder == null)
+                    this.entries.remove(target);
+                else
+                    folder.children.remove(target);
+
+                return true;
+            }
+
+            return false;
+        }
+
+    }
+
+    public static class DummyModelNavigator {
+
+        private DummyModel model;
+        private Stack<FolderEntry> hierarchy = new Stack<>();
+
+        public DummyModelNavigator(DummyModel model) {
+            this.model = model;
+        }
+
+        public boolean isAtRoot() {
+            return hierarchy.isEmpty();
+        }
+
+        public List<PasswordDatabaseEntry> getCurrentEntries() {
+            FolderEntry currentFolder = hierarchy.isEmpty() ? null : hierarchy.peek();
+            if (currentFolder == null)
+                return model.getEntries();
+            else
+                return currentFolder.children;
+        }
+
+        public String getFolderTitle() {
+            return hierarchy.isEmpty() ? null : hierarchy.peek().name;
+        }
+
+        public FolderEntry getFolder() {
+            return hierarchy.isEmpty() ? null : hierarchy.peek();
+        }
+
+        public boolean openFolder(PasswordDatabaseEntry entry) {
+            if (!(entry instanceof FolderEntry))
+                return false;
+
+            hierarchy.push((FolderEntry)entry);
+            return true;
+        }
+
+        public void closeFolder() {
+            hierarchy.pop();
         }
 
     }

@@ -1,15 +1,26 @@
 package uk.co.davidbaxter.letmepass.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class FolderEntry extends PasswordDatabaseEntry {
 
     public static final String TYPE = "folder";
 
-    public FolderEntry(String name) {
+    public List<PasswordDatabaseEntry> children = new ArrayList<>();
+
+    public FolderEntry(String name, List<PasswordDatabaseEntry> children) {
         super(name);
+        this.children.addAll(children);
+    }
+
+    public FolderEntry(String name) {
+        this(name, Collections.<PasswordDatabaseEntry>emptyList());
     }
 
     public int getEntryCount() {
-        return 4; // TODO
+        return children.size();
     }
 
     @Override
@@ -19,7 +30,10 @@ public class FolderEntry extends PasswordDatabaseEntry {
 
     @Override
     public Object clone() {
-        return new FolderEntry(name);
+        List<PasswordDatabaseEntry> clonedChildren = new ArrayList<>();
+        for (PasswordDatabaseEntry entry : children)
+            clonedChildren.add((PasswordDatabaseEntry) entry.clone());
+        return new FolderEntry(name, clonedChildren);
     }
 
     @Override
@@ -29,7 +43,8 @@ public class FolderEntry extends PasswordDatabaseEntry {
 
         super.fromCopy(entry);
         FolderEntry fEntry = (FolderEntry) entry;
-        // TODO here: copy impl-specific fields
+        this.children.clear();
+        this.children.addAll(fEntry.children);
     }
 
     public static FolderEntry newEmptyEntry() {

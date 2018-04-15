@@ -60,6 +60,7 @@
     <!-- Main screen strings -->
     <string name="main_label">Passwords</string>
     <string name="main_title_explore">Passwords</string>
+    <string name="main_title_exploring">%1$s</string><!-- folder name -->
     <string name="main_title_favorites">Favourites</string>
     <string name="main_title_all_passwords">All Passwords</string>
     <string name="main_title_search_results">Results for \'%1$s\'</string>

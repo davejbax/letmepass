@@ -1,5 +1,7 @@
 package uk.co.davidbaxter.letmepass.presentation;
 
+import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
+
 /**
  * Callbacks for navigation related actions for the MainViewModel
  */
@@ -36,6 +38,19 @@ public class MainNavigationCallbacks {
      */
     public void onCloseDatabase() {
         // TODO
+    }
+
+    public void onOpenFolder(PasswordDatabaseEntryContainer container) {
+        if (this.viewModel.navigator.openFolder(container.getEntry())) {
+            this.viewModel.canGoBack.postValue(true);
+            this.viewModel.refreshView();
+        }
+    }
+
+    public void onGoBack() {
+        this.viewModel.navigator.closeFolder();
+        this.viewModel.canGoBack.postValue(!this.viewModel.navigator.isAtRoot());
+        this.viewModel.refreshView();
     }
 
 }

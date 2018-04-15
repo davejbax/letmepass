@@ -107,11 +107,16 @@ public class MainActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             // 'Home' button, repurposed as navigation drawer open button
             case android.R.id.home:
-                if (drawerLayout == null)
-                    throw new RuntimeException("Drawer layout is null; was nav drawer setup?");
+                if (viewModel.getCanGoBack().getValue() != null
+                        && viewModel.getCanGoBack().getValue()) {
+                    this.viewModel.getNavigationCallbacks().onGoBack();
+                } else {
+                    if (drawerLayout == null)
+                        throw new RuntimeException("Drawer layout is null; was nav drawer setup?");
 
-                drawerLayout.openDrawer(GravityCompat.START);
-                return true;
+                    drawerLayout.openDrawer(GravityCompat.START);
+                    return true; // We processed the menu ourselves
+                }
         }
 
         return super.onOptionsItemSelected(item);
@@ -176,6 +181,15 @@ public class MainActivity extends AppCompatActivity implements
         // TODO: only close sometimes?
         this.drawerLayout.closeDrawer(GravityCompat.START);
         return true; // Show item as selected
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (this.viewModel.getCanGoBack().getValue() != null
+                && this.viewModel.getCanGoBack().getValue())
+            this.viewModel.getNavigationCallbacks().onGoBack();
+        else
+            super.onBackPressed();
     }
 
     private void setupPopupMenus() {
@@ -256,6 +270,19 @@ public class MainActivity extends AppCompatActivity implements
                         pair.first,
                         pair.second == null ? new Object[]{} : pair.second // Null coalescing
                 ));
+            }
+        });
+
+        // Subscribe to any changes of whether we can go back: we do this to set our home button
+        // to either a back arrow or a nav drawer button
+        this.viewModel.getCanGoBack().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean canGoBack) {
+                if (canGoBack != null && canGoBack) {
+                    actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+                } else {
+                    actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
+                }
             }
         });
     }
