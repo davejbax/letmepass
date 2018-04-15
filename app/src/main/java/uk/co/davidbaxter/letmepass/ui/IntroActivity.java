@@ -2,6 +2,7 @@ package uk.co.davidbaxter.letmepass.ui;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -26,6 +27,7 @@ public class IntroActivity extends AppCompatActivity {
         ActivityIntroBinding binding = DataBindingUtil.setContentView(
                 this,
                 R.layout.activity_intro);
+        binding.setLifecycleOwner(this);
 
         // Setup viewmodel
         this.viewModel = ViewModelProviders.of(this).get(IntroViewModel.class);
@@ -37,12 +39,27 @@ public class IntroActivity extends AppCompatActivity {
 
     private void setupEvents() {
         // Observe for changes to toast text
-        this.viewModel.getToastText().observe(this, new Observer<String>() {
+        this.viewModel.getAction().observe(this, new Observer<IntroViewModel.Action>() {
             @Override
-            public void onChanged(@Nullable String s) {
-                if (s == null) return;
-                Toast.makeText(IntroActivity.this, s, Toast.LENGTH_SHORT)
-                        .show();
+            public void onChanged(@Nullable IntroViewModel.Action action) {
+                Class<?> activityClass = null;
+
+                switch (action) {
+                    case NEW_DATABASE:
+                        activityClass = CreationActivity.class;
+                        break;
+                    case LOAD_CLOUD:
+                        // TODO: change this; this is for demonstration purposes
+                        activityClass = DecryptionActivity.class;
+                        break;
+                    case LOAD_DEVICE:
+                        // TODO: change this; this is for demonstration purposes
+                        activityClass = MainActivity.class;
+                        break;
+                }
+
+                Intent intent = new Intent(IntroActivity.this, activityClass);
+                IntroActivity.this.startActivity(intent);
             }
         });
     }
