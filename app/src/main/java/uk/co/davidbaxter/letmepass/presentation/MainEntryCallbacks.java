@@ -1,10 +1,13 @@
 package uk.co.davidbaxter.letmepass.presentation;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 
 import uk.co.davidbaxter.letmepass.R;
+import uk.co.davidbaxter.letmepass.model.DataEntry;
+import uk.co.davidbaxter.letmepass.model.FolderEntry;
+import uk.co.davidbaxter.letmepass.model.PasswordEntry;
 import uk.co.davidbaxter.letmepass.util.Triplet;
 
 /**
@@ -26,7 +29,12 @@ public class MainEntryCallbacks {
         if (container.isDivider())
             return;
 
-        // TODO: handle entry click
+        // TODO handle folder clicks
+
+        this.viewModel.dialog.postValue(new Pair<PasswordDatabaseEntryContainer, Boolean>(
+                container,
+                false // Not editable
+        ));
     }
 
     /**
@@ -44,7 +52,8 @@ public class MainEntryCallbacks {
      * @param container Container of entry
      */
     public void onToggleFavorite(PasswordDatabaseEntryContainer container) {
-        // TODO
+        container.getEntry().favorite = !container.getEntry().favorite;
+        this.saveEntry(container);
     }
 
     /**
@@ -52,7 +61,9 @@ public class MainEntryCallbacks {
      * @param container Container of entry
      */
     public void onEditEntry(PasswordDatabaseEntryContainer container) {
-        // TODO
+        this.viewModel.dialog.postValue(new Pair<PasswordDatabaseEntryContainer, Boolean>(
+                container, true // true = editable
+        ));
     }
 
     /**
@@ -60,19 +71,47 @@ public class MainEntryCallbacks {
      * @param container Container of entry
      */
     public void onDeleteEntry(PasswordDatabaseEntryContainer container) {
-        // TODO
+        this.viewModel.model.deleteEntry(container.getEntry());
+        this.viewModel.refreshView();
     }
 
     public void onNewFolder() {
-        // TODO
+        this.viewModel.dialog.postValue(new Pair<PasswordDatabaseEntryContainer, Boolean>(
+                new PasswordDatabaseEntryContainer(FolderEntry.newEmptyEntry(), null),
+                true // Editable
+        ));
     }
 
     public void onNewData() {
-        // TODO
+        this.viewModel.dialog.postValue(new Pair<PasswordDatabaseEntryContainer, Boolean>(
+                new PasswordDatabaseEntryContainer(DataEntry.newEmptyEntry(), null),
+                true // Editable
+        ));
     }
 
     public void onNewPassword() {
-        // TODO
+        this.viewModel.dialog.postValue(new Pair<PasswordDatabaseEntryContainer, Boolean>(
+                new PasswordDatabaseEntryContainer(PasswordEntry.newEmptyEntry(), null),
+                true // Editable
+        ));
+    }
+
+    /**
+     * Saves an entry held in a container to the model
+     * @param container Container containing entry to save
+     */
+    public void saveEntry(PasswordDatabaseEntryContainer container) {
+        // TODO impl save
+        this.viewModel.model.saveEntry(container.getEntry());
+        // If we are saving an existing entry, then simply update the container
+        if (this.viewModel.getContainers().getValue().contains(container)) {
+            this.viewModel.updateContainer.postValue(container);
+        // If we have a new entry (not in our list), refresh view/entries to get it and update view
+        } else {
+            // Refresh the view (i.e. re-get and set all entries)
+            // TODO: fix bug here: if searching and then adding a new entry, search results will be replaced
+            this.viewModel.refreshView();
+        }
     }
 
 }

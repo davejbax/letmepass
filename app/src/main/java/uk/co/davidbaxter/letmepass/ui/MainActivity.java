@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -30,7 +31,6 @@ import java.util.List;
 import uk.co.davidbaxter.letmepass.R;
 import uk.co.davidbaxter.letmepass.databinding.ActivityMainBinding;
 import uk.co.davidbaxter.letmepass.databinding.ComponentNavHeaderBinding;
-import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
 import uk.co.davidbaxter.letmepass.presentation.DisplayMode;
 import uk.co.davidbaxter.letmepass.presentation.MainViewModel;
 import uk.co.davidbaxter.letmepass.presentation.PasswordDatabaseEntryContainer;
@@ -75,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements
 
         // Setup popup menus
         this.setupPopupMenus();
+
+        // Setup dialogs
+        this.setupDialogs();
     }
 
     @Override
@@ -316,6 +319,47 @@ public class MainActivity extends AppCompatActivity implements
 
                 // Update the stuck divider since our new entries may have different dividers
                 sendStuckDividerUpdate();
+            }
+        });
+
+        // Subscribe to changes in specific containers so we can update individual RecyclerView
+        // entries
+        this.viewModel.getContainerUpdate().observe(this,
+                new Observer<PasswordDatabaseEntryContainer>() {
+            @Override
+            public void onChanged(@Nullable PasswordDatabaseEntryContainer container) {
+                passwordRecyclerAdapter.notifyContainerChanged(container);
+            }
+        });
+    }
+
+    private void setupDialogs() {
+        this.viewModel.getDialog().observe(this, new Observer<Pair<PasswordDatabaseEntryContainer, Boolean>>() {
+            @Override
+            public void onChanged(@Nullable Pair<PasswordDatabaseEntryContainer, Boolean> pair) {
+                if (pair == null || pair.first.getEntry() == null)
+                    return;
+
+                // Prepare arguments -- we can't instantiate a fragment with constructor args as
+                // this breaks fragments
+                Bundle args = new Bundle();
+                args.putSerializable(EntryDialogFragment.TAG_CONTAINER, pair.first);
+                args.putBoolean(EntryDialogFragment.TAG_EDITABLE, pair.second);
+
+                // Create the fragment and show the dialog
+                EntryDialogFragment dialogFragment = new EntryDialogFragment();
+                dialogFragment.setArguments(args);
+
+                if (/* isLargeLayout */true) { // TODO
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                            .replace(R.id.drawerLayoutMain, dialogFragment)
+                            .addToBackStack(null) // Makes transaction reversible
+                            .commit();
+                } else {
+                    dialogFragment.show(getSupportFragmentManager(), "EntryDialogFragment");
+                }
             }
         });
     }

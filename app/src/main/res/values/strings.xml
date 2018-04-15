@@ -70,7 +70,7 @@
     <string name="main_entry_subtitle_password">Username: %1$s</string><!-- username -->
     <string name="main_entry_subtitle_data">Text data</string>
     <string name="main_entry_subtitle_sorted"><b>%1$s</b>: %2$s</string><!-- sorting label, value -->
-    <string name="main_entry_subtitle_fav">\u2605 / %1$s</string><!-- show a star next to subtitle -->
+    <string name="main_entry_subtitle_fav">\u2605 %1$s</string><!-- show a star next to subtitle -->
 
     <!-- Main screen: search -->
     <string name="main_search_title">Search Passwords</string>
@@ -92,6 +92,35 @@
     <string name="main_sort_name">Name</string>
     <string name="main_sort_created">Created</string>
     <string name="main_sort_updated">Updated</string>
+
+    <!-- Password editing/viewing -->
+    <string name="entry_dialog_editing">Editing</string>
+    <string name="entry_dialog_viewing">Viewing</string>
+    <string name="entry_dialog_edit_btn">Edit</string>
+    <string name="entry_dialog_save_btn">Save changes</string>
+    <string name="entry_dialog_cancel_btn">Cancel</string>
+    <string name="entry_dialog_close_btn">Close</string>
+
+    <string name="label_entry_name">Name</string>
+    <string name="hint_entry_name">Name</string>
+    <string name="label_entry_password">Password (hold to copy)</string>
+    <string name="hint_entry_password">Password</string>
+    <string name="label_entry_username">Username</string>
+    <string name="hint_entry_username">Username</string>
+    <string name="label_entry_website">Website</string>
+    <string name="hint_entry_website">URL or website name</string>
+    <string name="label_entry_description">Description</string>
+    <string name="hint_entry_description">Description of entry or notes</string>
+    <string name="label_entry_created">Date Created</string>
+    <!-- No created hint, as not changeable -->
+    <string name="label_entry_updated">Date Updated</string>
+    <!-- No updated hint, as not changeable directly -->
+    <string name="hint_entry_foldername">
+        To edit folder name, tap on the name at the top of the
+        screen.
+    </string>
+    <string name="label_entry_data">Data</string>
+    <string name="hint_entry_data">Enter text data here</string>
 
     <!-- Other global strings -->
     <string name="pwd_flags_good_length">Minimum 12 characters</string>

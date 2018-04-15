@@ -5,8 +5,6 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
-import android.support.annotation.NonNull;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
@@ -14,10 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import uk.co.davidbaxter.letmepass.R;
 import uk.co.davidbaxter.letmepass.model.DataEntry;
@@ -69,6 +63,18 @@ public class MainViewModel extends ViewModel {
      */
     final SingleLiveEvent<Triplet<View, Integer, Object>> popupMenu
             = new SingleLiveEvent<>();
+
+    /**
+     * Dialog show event, to show a dialog to edit or view an entry; the emitted object in this case
+     * is a pair of the password container to edit/view, and whether it should be editable.
+     */
+    final SingleLiveEvent<Pair<PasswordDatabaseEntryContainer, Boolean>> dialog
+            = new SingleLiveEvent<>();
+
+    /**
+     * Event to update a single container in the view (rather than updating every container).
+     */
+    final SingleLiveEvent<PasswordDatabaseEntryContainer> updateContainer = new SingleLiveEvent<>();
 
     //________________________________INTERNALS________________________________
     /**
@@ -137,6 +143,20 @@ public class MainViewModel extends ViewModel {
         return popupMenu;
     }
 
+    /**
+     * Gets the LiveData event for password dialogs to be shown on screen; this is a pair of
+     * the PDE container, and a boolean which is true if the user wishes to edit a password.
+     *
+     * @return Dialog live data
+     */
+    public LiveData<Pair<PasswordDatabaseEntryContainer, Boolean>> getDialog() {
+        return dialog;
+    }
+
+    public LiveData<PasswordDatabaseEntryContainer> getContainerUpdate() {
+        return updateContainer;
+    }
+
     public MainEntryCallbacks getEntryCallbacks() {
         return entryCallbacks;
     }
@@ -182,6 +202,41 @@ public class MainViewModel extends ViewModel {
         // Otherwise, assume no entries/dividers
         else
             this.stuckContainer.postValue(NULL_DIVIDER_CONTAINER);
+    }
+
+    /**
+     * 'Refreshes' the view by re-setting title appropriately, re-fetching entries from the model,
+     * and updating the list of displayed entries.
+     * <p>
+     * Note that this method will replace search results if the displayed screen is currently search
+     * results, instead returning to whatever mode was selected before search.
+     */
+    public void refreshView() {
+        switch (this.currentMode) {
+            case EXPLORE:
+                this.screenTitle.postValue(new Pair<Integer, Object[]>(
+                        R.string.main_title_explore,
+                        null // No format params
+                ));
+                this.entries.postValue(this.model.getEntries());
+                break;
+
+            case FAVORITES:
+                this.screenTitle.postValue(new Pair<Integer, Object[]>(
+                        R.string.main_title_favorites,
+                        null // No format params
+                ));
+                this.entries.postValue(this.model.getFavorites());
+                break;
+
+            case ALL_PASSWORDS:
+                this.screenTitle.postValue(new Pair<Integer, Object[]>(
+                        R.string.main_title_all_passwords,
+                        null // No format params
+                ));
+                this.entries.postValue(this.model.getAllPasswords());
+                break;
+        }
     }
 
     /**
@@ -294,15 +349,15 @@ public class MainViewModel extends ViewModel {
         private List<PasswordDatabaseEntry> entries = new ArrayList<>();
 
         public DummyModel() {
-            PasswordEntry passwordEntry = new PasswordEntry("Netflix", "johnsmith");
+            PasswordEntry passwordEntry = new PasswordEntry("Netflix", "johnsmith", "xxxx", "", "");
             FolderEntry folderEntry = new FolderEntry("More");
-            DataEntry dataEntry = new DataEntry("Data!");
+            DataEntry dataEntry = new DataEntry("Data!", "");
 
             entries.add(passwordEntry);
             entries.add(folderEntry);
             entries.add(dataEntry);
             for (char a : "abcdef".toCharArray()) {
-                entries.add(new PasswordEntry(a + "", "person_" + a));
+                entries.add(new PasswordEntry(a + "", "person_" + a, "xxxxx", "", ""));
             }
         }
 
@@ -337,6 +392,19 @@ public class MainViewModel extends ViewModel {
             }
 
             return matching;
+        }
+
+        public void saveEntry(PasswordDatabaseEntry entry) {
+            if (entries.contains(entry)) {
+                // Dummy model does not implement saving; real model will
+                return;
+            } else {
+                entries.add(entry);
+            }
+        }
+
+        public void deleteEntry(PasswordDatabaseEntry entry) {
+            entries.remove(entry);
         }
 
     }

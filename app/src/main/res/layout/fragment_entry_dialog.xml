@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="entry"
+            type="android.arch.lifecycle.LiveData&lt;uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry&gt;" />
+        <variable
+            name="viewModel"
+            type="uk.co.davidbaxter.letmepass.presentation.EntryDialogViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:focusable="true"
+        android:clickable="true"><!-- Clickable to prevent click-through to main screen -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:paddingLeft="@dimen/view_padding"
+            android:paddingRight="@dimen/view_padding"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Icon for entry -->
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tint="@color/white"
+                app:imageResource="@{viewModel.getIconId()}" />
+
+            <!-- Title of entry -->
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/view_padding"
+                android:layout_weight="1"
+                android:enabled="@{viewModel.getEditable()}"
+                android:hint="@string/hint_entry_name"
+                android:text="@={entry.name}"
+                tools:text="Entry Name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:inputType="text"
+                android:background="@null" />
+
+            <!-- Indicator of whether we are editing or viewing -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/view_padding"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/white"
+                android:text="@{viewModel.getEditable() ? @string/entry_dialog_editing : @string/entry_dialog_viewing}"
+                tools:text="Viewing" />
+
+        </LinearLayout>
+
+        <!-- View group for the editors of individual entry types -->
+        <ScrollView
+            android:id="@+id/fragContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <!-- Fragment goes here -->
+
+        </ScrollView>
+
+        <!-- Bottom dialog buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:text="@{viewModel.getEditable() ? @string/entry_dialog_save_btn : @string/entry_dialog_edit_btn}"
+                android:onClick="@{() -> viewModel.getEditable() ? viewModel.onSave() : viewModel.onEdit()}" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:text="@{viewModel.getEditable() ? @string/entry_dialog_cancel_btn : @string/entry_dialog_close_btn}"
+                android:onClick="@{() -> viewModel.getEditable() ? viewModel.onCancel() : viewModel.onClose()}" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</layout>

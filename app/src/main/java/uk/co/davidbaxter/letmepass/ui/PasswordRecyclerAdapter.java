@@ -1,14 +1,10 @@
 package uk.co.davidbaxter.letmepass.ui;
 
-import android.arch.lifecycle.LifecycleOwner;
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.util.ListUpdateCallback;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -16,8 +12,6 @@ import java.util.List;
 
 import uk.co.davidbaxter.letmepass.BR;
 import uk.co.davidbaxter.letmepass.R;
-import uk.co.davidbaxter.letmepass.databinding.ComponentPwdListEntryBinding;
-import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
 import uk.co.davidbaxter.letmepass.presentation.MainViewModel;
 import uk.co.davidbaxter.letmepass.presentation.PasswordDatabaseEntryContainer;
 
@@ -33,8 +27,6 @@ public class PasswordRecyclerAdapter
 
     private static final int VIEW_TYPE_ENTRY = 0; // View type for password entries
     private static final int VIEW_TYPE_DIVIDER = 1; // View type for dividers
-
-    LifecycleOwner lifecycleOwner;
 
     private List<PasswordDatabaseEntryContainer> entries;
     private MainViewModel viewModel;
@@ -97,6 +89,16 @@ public class PasswordRecyclerAdapter
         // Update entries and notify of change so view is updated
         this.entries = newEntries;
         result.dispatchUpdatesTo(this);
+    }
+
+    /**
+     * Updates a single container in the view, if it exists. This will re-bind its contents.
+     * @param container Container to update
+     */
+    public void notifyContainerChanged(PasswordDatabaseEntryContainer container) {
+        int index = this.entries.indexOf(container);
+        if (index > -1)
+            this.notifyItemChanged(index);
     }
 
     @Override

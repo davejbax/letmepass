@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="entry"
+            type="android.arch.lifecycle.LiveData&lt;uk.co.davidbaxter.letmepass.model.FolderEntry&gt;" />
+        <variable
+            name="viewModel"
+            type="uk.co.davidbaxter.letmepass.presentation.EntryDialogViewModel" />
+        <import type="android.view.View" />
+    </data>
+
+    <LinearLayout
+        android:minWidth="300dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/view_padding"
+        android:orientation="vertical">
+
+        <!-- Info -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:text="@string/hint_entry_foldername"
+            android:visibility="@{viewModel.getEditable() ? View.VISIBLE : View.GONE}"
+            android:layout_marginBottom="@dimen/view_padding" />
+
+        <!-- Created date -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/colorDisabled"
+            android:text="@string/label_entry_created"
+            tools:text="Date Created" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/view_padding"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            android:text="@{viewModel.formatDate(entry.created)}" />
+
+        <!-- Updated date -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/colorDisabled"
+            android:text="@string/label_entry_updated"
+            tools:text="Date Updated" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            android:text="@{viewModel.formatDate(entry.updated)}" />
+
+    </LinearLayout>
+
+</layout>

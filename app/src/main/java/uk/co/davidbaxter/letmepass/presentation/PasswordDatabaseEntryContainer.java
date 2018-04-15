@@ -1,16 +1,11 @@
 package uk.co.davidbaxter.letmepass.presentation;
 
-import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Transformations;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.Serializable;
 
 import uk.co.davidbaxter.letmepass.R;
 import uk.co.davidbaxter.letmepass.model.DataEntry;
@@ -25,8 +20,10 @@ import uk.co.davidbaxter.letmepass.model.PasswordEntry;
  * containers to be stored in a contiguous list to be presented (a divider is a dummy list item that
  * contains no entry, but rather represents a division in the types of underlying entries, which may
  * be displayed).
+ * <p>
+ * This class is serializable so that it may be passed in a {@link android.os.Bundle}.
  */
-public class PasswordDatabaseEntryContainer {
+public class PasswordDatabaseEntryContainer implements Serializable {
 
     private final PasswordDatabaseEntry entry;
     private final boolean isDivider;
