@@ -42,6 +42,7 @@
                 android:inputType="textMultiLine"
                 android:lines="5"
                 android:text="@={entry.data}"
+                android:textColor="@color/black"
                 android:scrollbars="vertical" />
 
         </android.support.design.widget.TextInputLayout>
