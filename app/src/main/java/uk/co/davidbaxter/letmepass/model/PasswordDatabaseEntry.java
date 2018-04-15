@@ -1,14 +1,21 @@
 package uk.co.davidbaxter.letmepass.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-// TODO: doc; it is immutable bc it would break things otherwise
-public abstract class PasswordDatabaseEntry {
+/**
+ * Base class for password database entries. This class must be serializable and cloneable:
+ * serializable for the purposes of serializing/saving, cloneable because this class is inherently
+ * mutable as this makes editing entries easier.
+ * <p>
+ * Subclasses should override {@link #fromCopy(PasswordDatabaseEntry)}.
+ */
+public abstract class PasswordDatabaseEntry implements Serializable, Cloneable {
 
-    public final String name;
-    public final long created;
-    public final long updated;
-    public final boolean favorite;
+    public String name;
+    public long created;
+    public long updated;
+    public boolean favorite;
 
     protected PasswordDatabaseEntry(String name, long created, long updated, boolean favorite) {
         this.name = name;
@@ -32,4 +39,21 @@ public abstract class PasswordDatabaseEntry {
      */
     public abstract String getType();
 
+    /**
+     * Sets the fields of this entry to those of another entry. This is so contents can be changed
+     * while preserving a reference.
+     * <p>
+     * Subclasses should override this method to set subclass-specific fields.
+     *
+     * @param entry Entry from which to copy fields
+     */
+    public void fromCopy(PasswordDatabaseEntry entry) {
+        this.name = entry.name;
+        this.created = entry.created;
+        this.updated = entry.updated;
+        this.favorite = entry.favorite;
+    }
+
+    @Override
+    public abstract Object clone();
 }
