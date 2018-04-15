@@ -90,6 +90,14 @@ public class MainActivity extends AppCompatActivity implements
 
         // Setup clipboard
         this.setupClipboard();
+
+        // Listen to close events to close activity if necessary
+        this.viewModel.getCloseEvent().observe(this, new Observer<Void>() {
+            @Override
+            public void onChanged(@Nullable Void aVoid) {
+                MainActivity.this.finish();
+            }
+        });
     }
 
     @Override

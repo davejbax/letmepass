@@ -84,6 +84,8 @@ public class MainViewModel extends ViewModel {
      */
     final SingleLiveEvent<String> copyToClipboard = new SingleLiveEvent<>();
 
+    final SingleLiveEvent<Void> closeEvent = new SingleLiveEvent<>();
+
     //________________________________INTERNALS________________________________
     /**
      * Current display mode -- this does NOT include search results
@@ -172,6 +174,10 @@ public class MainViewModel extends ViewModel {
 
     public LiveData<String> getCopyToClipboard() {
         return this.copyToClipboard;
+    }
+
+    public LiveData<Void> getCloseEvent() {
+        return closeEvent;
     }
 
     public MainEntryCallbacks getEntryCallbacks() {

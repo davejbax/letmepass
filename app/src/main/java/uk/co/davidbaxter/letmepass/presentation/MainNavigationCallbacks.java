@@ -37,7 +37,8 @@ public class MainNavigationCallbacks {
      * Handles an action of closing the database
      */
     public void onCloseDatabase() {
-        // TODO
+        // TODO: in practice, save database? Or, save on each entry addition/edit/deletion?
+        this.viewModel.closeEvent.postValue(null);
     }
 
     public void onOpenFolder(PasswordDatabaseEntryContainer container) {
