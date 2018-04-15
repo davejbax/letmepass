@@ -79,6 +79,11 @@ public class MainViewModel extends ViewModel {
      */
     final SingleLiveEvent<PasswordDatabaseEntryContainer> updateContainer = new SingleLiveEvent<>();
 
+    /**
+     * Event to copy text to the clipboard
+     */
+    final SingleLiveEvent<String> copyToClipboard = new SingleLiveEvent<>();
+
     //________________________________INTERNALS________________________________
     /**
      * Current display mode -- this does NOT include search results
@@ -163,6 +168,10 @@ public class MainViewModel extends ViewModel {
 
     public LiveData<Boolean> getCanGoBack() {
         return canGoBack;
+    }
+
+    public LiveData<String> getCopyToClipboard() {
+        return this.copyToClipboard;
     }
 
     public MainEntryCallbacks getEntryCallbacks() {

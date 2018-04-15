@@ -20,7 +20,8 @@
         android:foreground="?attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
-        android:onClick="@{() -> viewModel.getEntryCallbacks().onContainerClick(entryContainer)}">
+        android:onClick="@{() -> viewModel.getEntryCallbacks().onContainerClick(entryContainer)}"
+        android:onLongClick="@{() -> viewModel.getEntryCallbacks().onCopyPassword(entryContainer)}">
 
         <ImageView
             android:id="@+id/imgEntryIcon"

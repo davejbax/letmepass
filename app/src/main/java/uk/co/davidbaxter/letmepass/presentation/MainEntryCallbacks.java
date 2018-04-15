@@ -101,6 +101,15 @@ public class MainEntryCallbacks {
         ));
     }
 
+    public boolean onCopyPassword(PasswordDatabaseEntryContainer container) {
+        if (!container.getEntry().getType().equals(PasswordEntry.TYPE))
+            return false;
+
+        PasswordEntry entry = (PasswordEntry) container.getEntry();
+        this.viewModel.copyToClipboard.postValue(entry.password);
+        return true;
+    }
+
     /**
      * Saves an entry held in a container to the model
      * @param container Container containing entry to save

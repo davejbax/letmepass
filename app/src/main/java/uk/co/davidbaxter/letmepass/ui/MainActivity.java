@@ -2,6 +2,9 @@ package uk.co.davidbaxter.letmepass.ui;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,6 +87,9 @@ public class MainActivity extends AppCompatActivity implements
 
         // Setup dialogs
         this.setupDialogs();
+
+        // Setup clipboard
+        this.setupClipboard();
     }
 
     @Override
@@ -392,6 +399,24 @@ public class MainActivity extends AppCompatActivity implements
                 } else {
                     dialogFragment.show(getSupportFragmentManager(), "EntryDialogFragment");
                 }
+            }
+        });
+    }
+
+    private void setupClipboard() {
+        final ClipboardManager clipboard = (ClipboardManager)
+                getSystemService(Context.CLIPBOARD_SERVICE);
+
+        this.viewModel.getCopyToClipboard().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                ClipData clip = ClipData.newPlainText("password", s);
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(
+                    MainActivity.this,
+                    R.string.main_copied_clipboard,
+                    Toast.LENGTH_SHORT)
+                .show();
             }
         });
     }

@@ -72,6 +72,7 @@
     <string name="main_entry_subtitle_data">Text data</string>
     <string name="main_entry_subtitle_sorted"><b>%1$s</b>: %2$s</string><!-- sorting label, value -->
     <string name="main_entry_subtitle_fav">\u2605 %1$s</string><!-- show a star next to subtitle -->
+    <string name="main_copied_clipboard">Copied password to clipboard!</string>
 
     <!-- Main screen: search -->
     <string name="main_search_title">Search Passwords</string>
