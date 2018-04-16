@@ -18,9 +18,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 import uk.co.davidbaxter.letmepass.model.FolderEntry;
@@ -29,6 +29,10 @@ import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
 import uk.co.davidbaxter.letmepass.util.Algorithms;
 import uk.co.davidbaxter.letmepass.util.Predicate;
 
+/**
+ * An implementation of {@link PasswordDatabase} that uses JSON to serialize/deserialize the
+ * database.
+ */
 public class JsonPasswordDatabase implements PasswordDatabase {
 
     private static final Gson GSON = new GsonBuilder().create();
@@ -49,6 +53,12 @@ public class JsonPasswordDatabase implements PasswordDatabase {
     // Default constructor for Gson reflection
     private JsonPasswordDatabase() {}
 
+    /**
+     * Constructs a new JsonPasswordDatabase with the given name and entries.
+     *
+     * @param name Name of database
+     * @param entries Entries to add to the database (may be empty)
+     */
     public JsonPasswordDatabase(String name, Collection<PasswordDatabaseEntry> entries) {
         this.name = name;
         this.entries.addAll(entries);
@@ -70,6 +80,9 @@ public class JsonPasswordDatabase implements PasswordDatabase {
 
     @Override
     public boolean deleteEntry(PasswordDatabaseEntry entry) {
+        if (entries.contains(entry))
+            return entries.remove(entry);
+
         PasswordDatabaseEntry parent = findParent(entry);
         if (parent == null)
             return false;
@@ -100,12 +113,25 @@ public class JsonPasswordDatabase implements PasswordDatabase {
             new Predicate<PasswordDatabaseEntry>() {
                 @Override
                 public boolean test(PasswordDatabaseEntry entry) {
-                    // Return any entry that isn't a folder
-                    return !entry.getType().equals(FolderEntry.TYPE);
+                    // Return all entries
+                    return true;
                 }
             },
             GET_CHILDREN
         );
+    }
+
+    @Override
+    public List<PasswordDatabaseEntry> getAllEntriesButFolders() {
+        List<PasswordDatabaseEntry> entries = new ArrayList<>(getAllEntries());
+        Iterator<PasswordDatabaseEntry> iter = entries.iterator();
+        while (iter.hasNext()) {
+            // Remove entries that are folders from the list
+            if (iter.next().getType().equals(FolderEntry.TYPE))
+                iter.remove();
+        }
+
+        return entries;
     }
 
     @Override
@@ -169,6 +195,20 @@ public class JsonPasswordDatabase implements PasswordDatabase {
         }, GET_CHILDREN);
     }
 
+    /**
+     * Deserializes a byte representation of the database (which must have been produced by
+     * {@link JsonPasswordDatabase#serialize()}) to produce a new JsonPasswordDatabase object from
+     * the representation. The exception to this is that the data produced by {@link #serialize()}
+     * may be gzipped, in which case `gzipped` should be set to true.
+     *
+     * @param data Data to deserialized
+     * @param gzipped Whether the data is gzipped
+     * @return JsonPasswordDatabase of the given data
+     * @throws IOException If the GZIP stream could not be decoded or there was an error processing
+     *                     the input stream.
+     * @throws JsonSyntaxException If the provided JSON in `data` contained syntactical errors.
+     * @throws JsonIOException If there was a problem reading the data
+     */
     public static JsonPasswordDatabase deserialize(byte[] data, boolean gzipped)
             throws IOException, JsonSyntaxException, JsonIOException {
         // Form input stream from our byte array, wrapping in GZIP input stream if gzipped
