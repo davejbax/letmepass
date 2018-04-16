@@ -44,6 +44,10 @@ public class IntroActivity extends AppCompatActivity {
             public void onChanged(@Nullable IntroViewModel.Action action) {
                 Class<?> activityClass = null;
 
+                // Sanity check
+                if (action == null)
+                    return;
+
                 switch (action) {
                     case NEW_DATABASE:
                         activityClass = CreationActivity.class;
