@@ -35,7 +35,9 @@ import uk.co.davidbaxter.letmepass.util.Predicate;
  */
 public class JsonPasswordDatabase implements PasswordDatabase {
 
-    private static final Gson GSON = new GsonBuilder().create();
+    private static final Gson GSON = new GsonBuilder()
+            .registerTypeAdapterFactory(new PasswordDatabaseEntryTypeAdapterFactory())
+            .create();
     private static final String CHARSET_NAME = "UTF-8";
     private static final Function<PasswordDatabaseEntry, List<PasswordDatabaseEntry>> GET_CHILDREN
             = new Function<PasswordDatabaseEntry, List<PasswordDatabaseEntry>>() {
