@@ -32,6 +32,9 @@ import uk.co.davidbaxter.letmepass.util.Predicate;
 /**
  * An implementation of {@link PasswordDatabase} that uses JSON to serialize/deserialize the
  * database.
+ * <p>
+ * References to PasswordDatabaseEntries in this context should be maintained; changes to these
+ * entries will reflect the changes in the database.
  */
 public class JsonPasswordDatabase implements PasswordDatabase {
 
@@ -68,7 +71,9 @@ public class JsonPasswordDatabase implements PasswordDatabase {
 
     @Override
     public void addEntry(PasswordDatabaseEntry entry) {
-        this.entries.add(entry);
+        // Only add entry if we don't already have it
+        if (!this.entries.contains(entry))
+            this.entries.add(entry);
     }
 
     @Override
@@ -77,14 +82,19 @@ public class JsonPasswordDatabase implements PasswordDatabase {
             return;
 
         FolderEntry folder = (FolderEntry) parent;
-        folder.children.add(entry);
+
+        // Only add if we don't already have exactly the same entry (reference-wise)
+        if (!folder.children.contains(entry))
+            folder.children.add(entry);
     }
 
     @Override
     public boolean deleteEntry(PasswordDatabaseEntry entry) {
+        // If entry exists in root, remove it from here
         if (entries.contains(entry))
             return entries.remove(entry);
 
+        // Entry not in root: we need to find its parent
         PasswordDatabaseEntry parent = findParent(entry);
         if (parent == null)
             return false;

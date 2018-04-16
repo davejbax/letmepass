@@ -9,6 +9,7 @@ import android.util.Pair;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -17,8 +18,11 @@ import java.util.Stack;
 import uk.co.davidbaxter.letmepass.R;
 import uk.co.davidbaxter.letmepass.model.DataEntry;
 import uk.co.davidbaxter.letmepass.model.FolderEntry;
+import uk.co.davidbaxter.letmepass.model.PasswordDatabase;
 import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
+import uk.co.davidbaxter.letmepass.model.PasswordDatabaseNavigator;
 import uk.co.davidbaxter.letmepass.model.PasswordEntry;
+import uk.co.davidbaxter.letmepass.model.impl.JsonPasswordDatabase;
 import uk.co.davidbaxter.letmepass.util.SingleLiveEvent;
 import uk.co.davidbaxter.letmepass.util.Triplet;
 
@@ -93,9 +97,18 @@ public class MainViewModel extends ViewModel {
     DisplayMode currentMode = DisplayMode.EXPLORE;
 
     // TODO: replace with real model
-    DummyModel model = new DummyModel();
+    JsonPasswordDatabase database = new JsonPasswordDatabase("DB Name",
+            Arrays.asList(
+                    new PasswordEntry("Netflix", "johnsmith", "badpass", "http://netflix.com", ""),
+                    new PasswordEntry("Facebook", "johnsmith", "badpass", "http://facebook.com", ""),
+                    new PasswordEntry("Twitter", "@johnsmith", "badpass", "http://twitter.com", ""),
+                    new DataEntry("Banking Details", "Account no: 1234567890"),
+                    new FolderEntry("School", Arrays.<PasswordDatabaseEntry>asList(
+                            new PasswordEntry("School login", "11jsmith", "badpass1", "", "")
+                    ))
+            ));
 
-    DummyModelNavigator navigator = new DummyModelNavigator(model);
+    PasswordDatabaseNavigator navigator = new PasswordDatabaseNavigator(database);
 
     /**
      * List of containers of password entries -- these are transformed from model-returned password
@@ -122,7 +135,7 @@ public class MainViewModel extends ViewModel {
     public MainViewModel() {
         this.sortingCriteria.setValue(SortingCriteria.NAME_ASC);
         this.containers = transformIntoContainers(entries);
-        this.entries.postValue(this.model.getEntries());
+        this.entries.postValue(this.database.getRootEntries());
         this.stuckContainer.setValue(new PasswordDatabaseEntryContainer(R.string.main_divider_passwords));
     }
 
@@ -241,9 +254,9 @@ public class MainViewModel extends ViewModel {
                         : R.string.main_title_exploring;
                 this.screenTitle.postValue(new Pair<Integer, Object[]>(
                         stringId,
-                        new String[] { navigator.getFolderTitle() } // No format params
+                        new String[] { navigator.getFolderName() }
                 ));
-                this.entries.postValue(this.navigator.getCurrentEntries());
+                this.entries.postValue(this.navigator.getFolderEntries());
                 break;
 
             case FAVORITES:
@@ -251,7 +264,7 @@ public class MainViewModel extends ViewModel {
                         R.string.main_title_favorites,
                         null // No format params
                 ));
-                this.entries.postValue(this.model.getFavorites());
+                this.entries.postValue(this.database.getFavorites());
                 break;
 
             case ALL_PASSWORDS:
@@ -259,7 +272,7 @@ public class MainViewModel extends ViewModel {
                         R.string.main_title_all_passwords,
                         null // No format params
                 ));
-                this.entries.postValue(this.model.getAllPasswords());
+                this.entries.postValue(this.database.getAllEntriesButFolders());
                 break;
         }
     }
@@ -367,150 +380,6 @@ public class MainViewModel extends ViewModel {
                 return 0;
             }
         };
-    }
-
-    public static class DummyModel {
-
-        private List<PasswordDatabaseEntry> entries = new ArrayList<>();
-
-        public DummyModel() {
-            PasswordEntry passwordEntry = new PasswordEntry("Netflix", "johnsmith", "xxxx", "", "");
-            FolderEntry folderEntry = new FolderEntry("More");
-            DataEntry dataEntry = new DataEntry("Data!", "");
-
-            entries.add(passwordEntry);
-            entries.add(folderEntry);
-            entries.add(dataEntry);
-            for (char a : "abcdef".toCharArray()) {
-                entries.add(new PasswordEntry(a + "", "person_" + a, "xxxxx", "", ""));
-            }
-        }
-
-        public List<PasswordDatabaseEntry> getEntries() {
-            return entries;
-        }
-
-        public List<PasswordDatabaseEntry> getFavorites() {
-            List<PasswordDatabaseEntry> matching = new ArrayList<>();
-            for (PasswordDatabaseEntry entry : entries)
-                if (entry.favorite)
-                    matching.add(entry);
-            return matching;
-        }
-
-        public List<PasswordDatabaseEntry> getAllPasswords() {
-            List<PasswordDatabaseEntry> allPasswords = new ArrayList<>();
-            for (PasswordDatabaseEntry entry : entries)
-                if (!entry.getType().equals(FolderEntry.TYPE))
-                    allPasswords.add(entry);
-            return allPasswords;
-        }
-
-        public List<PasswordDatabaseEntry> search(String query) {
-            query = query.toLowerCase();
-
-            List<PasswordDatabaseEntry> matching = new ArrayList<>();
-            // Add all entries containing the search query (in lowercase) to matches
-            for (PasswordDatabaseEntry entry : entries) {
-                if (entry.name.toLowerCase().contains(query))
-                    matching.add(entry);
-            }
-
-            return matching;
-        }
-
-        public void saveEntry(PasswordDatabaseEntry entry) {
-            if (entries.contains(entry)) {
-                // Dummy model does not implement saving; real model will
-                return;
-            } else {
-                entries.add(entry);
-            }
-        }
-
-        public void saveToFolder(FolderEntry folder, PasswordDatabaseEntry entry) {
-            if (!folder.children.contains(entry))
-                folder.children.add(entry);
-        }
-
-        public void deleteEntry(PasswordDatabaseEntry entry) {
-            deleteRecursively(null, entry);
-        }
-
-        private boolean deleteRecursively(FolderEntry folder, PasswordDatabaseEntry target) {
-            List<PasswordDatabaseEntry> entries;
-            if (folder == null)
-                entries = this.entries;
-            else
-                entries = folder.children;
-
-            boolean found = false;
-
-            for (PasswordDatabaseEntry entry : entries) {
-                if (entry == target) {
-                    found = true;
-                    break;
-                } else if (entry.getType().equals(FolderEntry.TYPE)) {
-                    if (deleteRecursively((FolderEntry) entry, target))
-                        return true;
-                }
-            }
-
-            if (found) {
-                if (folder == null)
-                    this.entries.remove(target);
-                else
-                    folder.children.remove(target);
-
-                return true;
-            }
-
-            return false;
-        }
-
-    }
-
-    public static class DummyModelNavigator {
-
-        private DummyModel model;
-        private Stack<FolderEntry> hierarchy = new Stack<>();
-
-        public DummyModelNavigator(DummyModel model) {
-            this.model = model;
-        }
-
-        public boolean isAtRoot() {
-            return hierarchy.isEmpty();
-        }
-
-        public List<PasswordDatabaseEntry> getCurrentEntries() {
-            FolderEntry currentFolder = hierarchy.isEmpty() ? null : hierarchy.peek();
-            if (currentFolder == null)
-                return model.getEntries();
-            else
-                return currentFolder.children;
-        }
-
-        public String getFolderTitle() {
-            return hierarchy.isEmpty() ? null : hierarchy.peek().name;
-        }
-
-        public FolderEntry getFolder() {
-            return hierarchy.isEmpty() ? null : hierarchy.peek();
-        }
-
-        public boolean openFolder(PasswordDatabaseEntry entry) {
-            if (!(entry instanceof FolderEntry))
-                return false;
-
-            hierarchy.push((FolderEntry)entry);
-            return true;
-        }
-
-        public void closeFolder() {
-            hierarchy.pop();
-        }
-
     }
 
 }

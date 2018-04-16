@@ -1,5 +1,6 @@
 package uk.co.davidbaxter.letmepass.presentation;
 
+import uk.co.davidbaxter.letmepass.model.FolderEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
 
 /**
@@ -42,7 +43,8 @@ public class MainNavigationCallbacks {
     }
 
     public void onOpenFolder(PasswordDatabaseEntryContainer container) {
-        if (this.viewModel.navigator.openFolder(container.getEntry())) {
+        if (container.getEntry().getType().equals(FolderEntry.TYPE)) {
+            this.viewModel.navigator.openFolder((FolderEntry) container.getEntry());
             this.viewModel.canGoBack.postValue(true);
             this.viewModel.refreshView();
         }

@@ -76,7 +76,7 @@ public class MainEntryCallbacks {
      * @param container Container of entry
      */
     public void onDeleteEntry(PasswordDatabaseEntryContainer container) {
-        this.viewModel.model.deleteEntry(container.getEntry());
+        this.viewModel.database.deleteEntry(container.getEntry());
         this.viewModel.refreshView();
     }
 
@@ -117,11 +117,11 @@ public class MainEntryCallbacks {
     public void saveEntry(PasswordDatabaseEntryContainer container) {
         // TODO impl save
         if (this.viewModel.navigator.isAtRoot()) {
-            this.viewModel.model.saveEntry(container.getEntry());
+            this.viewModel.database.addEntry(container.getEntry());
         } else {
-            this.viewModel.model.saveToFolder(
-                    this.viewModel.navigator.getFolder(),
-                    container.getEntry()
+            this.viewModel.database.addEntry(
+                    container.getEntry(),
+                    this.viewModel.navigator.getFolder()
             );
         }
         // If we are saving an existing entry, then simply update the container
