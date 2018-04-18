@@ -13,7 +13,7 @@ Note that this component requires a password flags variable, so that this data b
         <!-- TODO: change this placeholder type -->
         <variable
             name="passwordFlags"
-            type="uk.co.davidbaxter.letmepass.presentation.CreationViewModel.DummyPasswordFlagsClass" />
+            type="uk.co.davidbaxter.letmepass.model.PasswordFlags" />
     </data>
 
     <!-- Wrap in TableLayout so that columns are ticks/crosses and text, and rows are the different

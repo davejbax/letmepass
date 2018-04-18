@@ -54,7 +54,7 @@ public class MainSearchCallbacks {
 
         // Retrieve search results from the model
         // TODO: in practice, use a Callback to post this value: i.e. model takes a callback arg
-        viewModel.entries.postValue(viewModel.model.search(query));
+        viewModel.entries.postValue(viewModel.database.search(query));
 
         // Update title and recreate containers to update view
         viewModel.screenTitle.postValue(new Pair<Integer, Object[]>(

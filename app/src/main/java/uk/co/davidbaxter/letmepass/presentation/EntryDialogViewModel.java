@@ -11,6 +11,7 @@ import java.util.Date;
 
 import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordEntry;
+import uk.co.davidbaxter.letmepass.model.PasswordFlags;
 import uk.co.davidbaxter.letmepass.util.SingleLiveEvent;
 
 /**
@@ -44,7 +45,7 @@ public class EntryDialogViewModel extends ViewModel {
      */
     private MutableLiveData<PasswordDatabaseEntry> workingEntry = new MutableLiveData<>();
 
-    private MutableLiveData<CreationViewModel.DummyPasswordFlagsClass> passwordFlags =
+    private MutableLiveData<PasswordFlags> passwordFlags =
             new MutableLiveData<>();
 
     /**
@@ -67,11 +68,12 @@ public class EntryDialogViewModel extends ViewModel {
         this.editable.setValue(editable);
         this.container = container;
         this.workingEntry.setValue((PasswordDatabaseEntry) container.getEntry().clone());
-        this.passwordFlags.setValue(new CreationViewModel.DummyPasswordFlagsClass());
+        this.passwordFlags.setValue(new PasswordFlags());
 
         // Initialize password flags for the current password
         if (container.getEntry().getType().equals(PasswordEntry.TYPE))
-            this.passwordFlags.getValue().recalculate(
+            CreationViewModel.generateFlags(
+                    this.passwordFlags.getValue(),
                     ((PasswordEntry) container.getEntry()).password
             );
     }
@@ -112,7 +114,7 @@ public class EntryDialogViewModel extends ViewModel {
         return this.workingEntry;
     }
 
-    public LiveData<CreationViewModel.DummyPasswordFlagsClass> getPasswordFlags() {
+    public LiveData<PasswordFlags> getPasswordFlags() {
         return this.passwordFlags;
     }
 
@@ -138,12 +140,12 @@ public class EntryDialogViewModel extends ViewModel {
 
     public void onPasswordChanged(CharSequence newPassword, int start, int before, int count) {
         // Retrieve or create flags
-        CreationViewModel.DummyPasswordFlagsClass flags = passwordFlags.getValue();
+        PasswordFlags flags = passwordFlags.getValue();
         if (flags == null)
-            flags = new CreationViewModel.DummyPasswordFlagsClass();
+            flags = new PasswordFlags();
 
         // Get password and recalculate flags based on it
-        flags.recalculate(newPassword.toString());
+        CreationViewModel.generateFlags(flags, newPassword.toString());
 
         // Update flags in view
         passwordFlags.postValue(flags);
