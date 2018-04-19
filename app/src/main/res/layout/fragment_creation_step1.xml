@@ -46,6 +46,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:checked="@{viewModel.cloudChecked}"
                     android:onClick="@{() -> viewModel.setCloudChecked(true) }"
                     android:text="@string/creation_choose_cloud"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
@@ -78,6 +79,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:checked="@{!viewModel.cloudChecked}"
                     android:onClick="@{() -> viewModel.setCloudChecked(false) }"
                     android:text="@string/creation_choose_device"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />

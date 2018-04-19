@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,12 @@ public abstract class CreationStepFragmentBase<T extends ViewDataBinding>
      */
     protected abstract void initDataBinding(T binding);
 
+    /**
+     * Gets the unique ID for this step
+     * @return Step ID
+     */
+    protected abstract int getStepId();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +90,12 @@ public abstract class CreationStepFragmentBase<T extends ViewDataBinding>
     @Override
     public VerificationError verifyStep() {
         // Return null for no error/step success
+        Pair<Integer, Object[]> error = viewModel.onVerifyStep(getStepId());
+        if (error != null) {
+            String errorString = getString(error.first, error.second);
+            return new VerificationError(errorString);
+        }
+
         return null;
     }
 

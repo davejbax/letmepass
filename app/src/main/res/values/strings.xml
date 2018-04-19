@@ -4,6 +4,7 @@
     <string name="app_logo">*</string>
     <string name="app_version">0.1.0</string>
     <string name="empty_string"></string>
+    <string name="database_filename_default">mydatabase.lmpdb</string>
 
     <!-- Screen: intro -->
     <string name="intro_new">New Database</string>
@@ -37,6 +38,7 @@
         Finally, please re-enter the master password to ensure that it was entered correctly.
     </string>
     <string name="creation_choose_cloud">Cloud storage with Google Drive</string>
+    <string name="creation_choose_cloud_dialog_title">Create new database file</string>
     <string name="creation_choose_device">Device storage</string>
     <string name="creation_open_file">Choose file</string>
     <string name="creation_location">Location: %1$s</string>
@@ -56,6 +58,35 @@
     </string>
     <string name="creation_db_name_hint">Database name</string>
     <string name="creation_db_is_default">Load this database on app launch</string>
+    <string name="creation_dialog_warning_title">Warning</string>
+    <string name="creation_dialog_cancel">Go back</string>
+    <string name="creation_dialog_continue">Continue</string>
+    <string name="creation_dialog_create_file">Choose file name</string>
+    <string name="creation_dialog_filename_hint">File name</string>
+    <string name="creation_dialog_ok">OK</string>
+    <string name="creation_creating_db">Creating your database&#8230;</string>
+
+    <!-- Screen: creation - warnings -->
+    <string name="creation_warning_mp_blacklisted">
+        This master password is blacklisted, as it is a commonly used password. It is strongly
+        recommended that you go back and change it. Continue anyway?
+    </string>
+    <string name="creation_warning_mp_low_entropy">
+        This master password is not very complex, and will be easily broken by an attacker. Are
+        you sure you want to continue?
+    </string>
+
+    <!-- Screen: creation - errors -->
+    <string name="creation_error_no_cloud_location_chosen">Please choose a file</string>
+    <string name="creation_error_no_device_location_chosen">Please choose a file</string>
+    <string name="creation_error_no_mp">Please enter a password</string>
+    <string name="creation_error_mp_too_short">Master password too short</string>
+    <string name="creation_error_mp_again_wrong">Incorrect master password</string>
+    <string name="creation_error_no_filename">Please enter a filename</string>
+    <string name="creation_error_io_error">Could not create file</string>
+    <string name="creation_error_file_exists">File already exists</string>
+    <string name="creation_error_filename_invalid">File name is invalid</string>
+
     <!-- File picker strings -->
     <string name="file_picker_label">Choose file</string>
     <string name="file_picker_updated">Last updated: %1$s</string>
@@ -127,6 +158,13 @@
     <string name="label_entry_data">Data</string>
     <string name="hint_entry_data">Enter text data here</string>
     <string name="label_entry_flags">Password strength</string>
+
+    <!-- Google Drive -->
+    <string name="drive_sign_in_cancelled">To use cloud storage, you must sign in with Google</string>
+    <string name="drive_sign_in_failed">Failed to sign in to Google Drive</string>
+    <string name="drive_create_cancelled">Cloud file creation cancelled</string>
+    <string name="drive_create_failed">Failed to create cloud file</string>
+    <string name="drive_internal_error">Cloud storage failed</string>
 
     <!-- Other global strings -->
     <string name="pwd_flags_good_length">Minimum 12 characters</string>
