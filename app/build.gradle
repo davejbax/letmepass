@@ -27,6 +27,10 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    // Google Drive API for storage
+    implementation 'com.google.android.gms:play-services-auth:15.0.0'
+    implementation 'com.google.android.gms:play-services-drive:15.0.0'
+
     // Appcompat library for older API support
     implementation 'com.android.support:support-v4:26.1.0'
     implementation 'com.android.support:appcompat-v7:26.1.0'

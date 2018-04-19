@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="container"
+            type="uk.co.davidbaxter.letmepass.presentation.FilePickerViewModel.Container" />
+        <variable
+            name="viewModel"
+            type="uk.co.davidbaxter.letmepass.presentation.FilePickerViewModel" />
+        <import type="uk.co.davidbaxter.letmepass.R" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginBottom="1dp"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/view_padding"
+        android:paddingStart="@dimen/view_padding"
+        android:paddingRight="@dimen/view_padding"
+        android:paddingEnd="@dimen/view_padding"
+        android:background="@color/white"
+        android:foreground="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="@{() -> viewModel.onContainerClick(container)}">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="@{container.name}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{context.getString(R.string.file_picker_updated, container.formatUpdated())}" />
+    </LinearLayout>
+
+</layout>

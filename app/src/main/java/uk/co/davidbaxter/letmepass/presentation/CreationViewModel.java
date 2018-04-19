@@ -1,14 +1,45 @@
 package uk.co.davidbaxter.letmepass.presentation;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
+import android.support.annotation.Nullable;
+import android.util.Pair;
 
+import java.util.Collections;
+
+import uk.co.davidbaxter.letmepass.R;
+import uk.co.davidbaxter.letmepass.model.PasswordDatabase;
+import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordFlags;
+import uk.co.davidbaxter.letmepass.model.impl.JsonPasswordDatabase;
+import uk.co.davidbaxter.letmepass.session.SessionContext;
+import uk.co.davidbaxter.letmepass.session.SessionContextRegistry;
+import uk.co.davidbaxter.letmepass.session.impl.DefaultSessionContext;
+import uk.co.davidbaxter.letmepass.storage.DataStore;
+import uk.co.davidbaxter.letmepass.storage.impl.DriveDataStore;
+import uk.co.davidbaxter.letmepass.storage.impl.FileDataStore;
+import uk.co.davidbaxter.letmepass.util.AsyncUtils;
+import uk.co.davidbaxter.letmepass.util.SingleLiveEvent;
 
 public class CreationViewModel extends ViewModel {
+
+    public static final int ID_STEP_1 = 1;
+    public static final int ID_STEP_2 = 2;
+    public static final int ID_STEP_3 = 3;
+    public static final int ID_STEP_4 = 4;
+
+    /**
+     * A live event to signal to the view that it should open dialogs to choose files. If the
+     * passed value is true, then this should be for cloud storage. Otherwise, it should be for
+     * device storage
+     */
+    private SingleLiveEvent<Boolean> chooseStorageEvent = new SingleLiveEvent<>();
+
+    /**
+     * A live event to signal to the view to open the main activity, as the session has been created
+     */
+    private SingleLiveEvent<Void> launchMainEvent = new SingleLiveEvent<>();
 
     // Bound fields: these are set by the view, and can be read/set by us
     public MutableLiveData<String> masterPassword = new MutableLiveData<>();
@@ -24,6 +55,10 @@ public class CreationViewModel extends ViewModel {
     public MutableLiveData<String> keyfileLocation = new MutableLiveData<>();
     public MutableLiveData<PasswordFlags> passwordFlags = new MutableLiveData<>();
 
+    // Parameters from which to construct session
+    private DataStore cloudDataStore = null;
+    private DataStore deviceDataStore = null;
+
     public CreationViewModel() {
         this.cloudChecked.setValue(true);
     }
@@ -32,12 +67,21 @@ public class CreationViewModel extends ViewModel {
         this.cloudChecked.postValue(cloudChecked);
     }
 
+    // TODO doc
+    public LiveData<Boolean> getChooseStorageEvent() {
+        return chooseStorageEvent;
+    }
+
+    public LiveData<Void> getLaunchMainEvent() {
+        return launchMainEvent;
+    }
+
     public void onOpenCloud() {
-        // TODO
+        chooseStorageEvent.postValue(true);
     }
 
     public void onOpenDevice() {
-        // TODO
+        chooseStorageEvent.postValue(false);
     }
 
     public void onBreachCheck() {
@@ -62,6 +106,117 @@ public class CreationViewModel extends ViewModel {
 
         // Re-set passwordFlags LiveData so UI updates
         passwordFlags.setValue(pwdFlags);
+    }
+
+    public void onDriveCreated(DriveDataStore store) {
+        this.cloudDataStore = store;
+        AsyncUtils.futureToLiveData(store.getStoreName(), cloudLocation, false).execute();
+    }
+
+    public void onFileCreated(FileDataStore store) {
+        this.deviceDataStore = store;
+        AsyncUtils.futureToLiveData(store.getStoreName(), deviceLocation, false).execute();
+    }
+
+    public void onComplete() {
+        // Create the database
+        PasswordDatabase database = new JsonPasswordDatabase(dbName.getValue() == null ? ""
+                : dbName.getValue(), Collections.<PasswordDatabaseEntry>emptyList());
+
+        // Get the datastore so we can write database
+        DataStore dataStore = cloudChecked.getValue() != null && cloudChecked.getValue() ?
+                cloudDataStore : deviceDataStore;
+
+        SessionContext context = new DefaultSessionContext();
+        context.setDataStore(dataStore);
+        context.setDatabase(database);
+        context.setMasterPassword(masterPassword.getValue());
+        // TODO: context.setEncrypter(...)
+        // TODO here: create a SessionContextFactory of some sort? Encrypter will need deps at least
+
+        // Set the session context singleton
+        SessionContextRegistry.setSessionContext(context);
+
+        // Signal to the view that we are ready to launch the main screen
+        launchMainEvent.postValue(null);
+    }
+
+    public @Nullable Pair<Integer, Object[]> onVerifyStep(int stepId) {
+        switch (stepId) {
+            case ID_STEP_1:
+                return verifyStep1();
+            case ID_STEP_2:
+                return verifyStep2();
+            case ID_STEP_3:
+                return verifyStep3();
+            case ID_STEP_4:
+                return verifyStep4();
+            default:
+                // We don't know this step. Assume no error?
+                return null;
+        }
+    }
+
+    public @Nullable Pair<Integer, Integer> generateBlockingDialog(int stepId) {
+        switch (stepId) {
+            case ID_STEP_2:
+                // Step 2: we verify that our optional password flags are reasonable, and if not,
+                // we warn the user with this dialog.
+                if (passwordFlags.getValue() != null) {
+                    // If the password is blacklisted, show them a very stern warning
+                    if (!passwordFlags.getValue().notBlacklisted)
+                        return Pair.create(R.string.creation_dialog_warning_title,
+                                R.string.creation_warning_mp_blacklisted);
+                    // If the password does not have mixed chars AND does not have symbols, warn.
+                    else if (!passwordFlags.getValue().hasMixedChars
+                            && !passwordFlags.getValue().hasSymbols)
+                        return Pair.create(R.string.creation_dialog_warning_title,
+                                R.string.creation_warning_mp_low_entropy);
+                }
+        }
+
+        return null;
+    }
+
+    private @Nullable Pair<Integer, Object[]> verifyStep1() {
+        if (cloudChecked.getValue() != null && cloudChecked.getValue()) {
+            // If cloud is checked, we need to have a cloud data store
+            if (cloudDataStore == null)
+                return Pair.create(R.string.creation_error_no_cloud_location_chosen,
+                        new Object[] {});
+        } else {
+            // If device is checked, we need to have a device data store
+            if (deviceDataStore == null)
+                return Pair.create(R.string.creation_error_no_device_location_chosen,
+                        new Object[] {});
+        }
+
+        return null;
+    }
+
+    private @Nullable Pair<Integer, Object[]> verifyStep2() {
+        if (masterPassword.getValue() == null) {
+            return Pair.create(R.string.creation_error_no_mp, new Object[] {});
+        } else if (passwordFlags.getValue() == null || !passwordFlags.getValue().goodLength) {
+            return Pair.create(R.string.creation_error_mp_too_short, new Object[] {});
+        }
+        return null;
+    }
+
+    private @Nullable Pair<Integer, Object[]> verifyStep3() {
+        // No verification needed
+        return null;
+    }
+
+    private @Nullable Pair<Integer, Object[]> verifyStep4() {
+        // Ensure the master password entered again is EXACTLY the same as the master password
+        // entered in the other step.
+        if (masterPasswordAgain.getValue() == null
+                || masterPassword.getValue() == null
+                || !masterPasswordAgain.getValue().equals(masterPassword.getValue())) {
+            return Pair.create(R.string.creation_error_mp_again_wrong, new Object[] {});
+        }
+        return null;
     }
 
     public static void generateFlags(PasswordFlags flags, String password) {
