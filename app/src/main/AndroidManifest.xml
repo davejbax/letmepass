@@ -31,7 +31,11 @@
         <activity
             android:name=".ui.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:label="@string/main_label"/>
+            android:label="@string/main_label" />
+
+        <activity
+            android:name=".ui.FilePickerActivity"
+            android:label="@string/file_picker_label" />
 
     </application>
 

@@ -56,6 +56,9 @@
     </string>
     <string name="creation_db_name_hint">Database name</string>
     <string name="creation_db_is_default">Load this database on app launch</string>
+    <!-- File picker strings -->
+    <string name="file_picker_label">Choose file</string>
+    <string name="file_picker_updated">Last updated: %1$s</string>
 
     <!-- Main screen strings -->
     <string name="main_label">Passwords</string>
