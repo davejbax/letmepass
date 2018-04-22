@@ -20,7 +20,7 @@ import uk.co.davidbaxter.letmepass.crypto.IvFactory;
  */
 public class HybridIvFactory implements IvFactory {
 
-    private static final int IV_LENGTH = 12; // bytes
+    public static final int IV_LENGTH = 12; // bytes
     private static final int RAND_LENGTH = 8; // How many bytes of IV is random?
     private static final int COUNT_LENGTH = 4; // How many bytes of IV is counter?
 
@@ -78,8 +78,11 @@ public class HybridIvFactory implements IvFactory {
     }
 
     private byte[] fromInt32BE(int i) {
-        return ByteBuffer.allocate(4)
-                .putInt(i)
-                .array();
+         byte[] out = new byte[4];
+         ByteBuffer buff = ByteBuffer.allocate(4)
+                 .putInt(i);
+         buff.rewind();
+         buff.get(out);
+         return out;
     }
 }
