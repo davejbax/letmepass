@@ -1,7 +1,5 @@
 package uk.co.davidbaxter.letmepass.crypto.impl;
 
-import android.util.Log;
-
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.engines.AESFastEngine;
 import org.bouncycastle.crypto.modes.GCMBlockCipher;
@@ -31,12 +29,18 @@ import uk.co.davidbaxter.letmepass.crypto.KeyDerivationFunction;
  *         hence the use of this abstraction.
  *     </li>
  * </ul>
+ * One important point to note is that the {@link #encrypt(byte[])} method does NOT re-generate the
+ * IV: the current IV in the IvFactory is used. It is <b>STRONGLY RECOMMENDED</b> that the method
+ * {@link #encryptAndRegenerateIv(byte[])} be used instead in most cases; if {@link #encrypt(byte[])}
+ * must be used, the IV <b>MUST</b> be re-generated manually beforehand if the current IV has
+ * already been used in encryption for some data. Failure to do this will compromise the security
+ * of the encryption due to the nature of GCM.
  */
 public class AesGcmEncrypter implements Encrypter {
 
     private static final int DEFAULT_MAC_SIZE = 128; // NIST says 128, 120, 112, 104, 96 generally.
 
-    private final KeyDerivationFunction kdf;
+    private KeyDerivationFunction kdf;
     private String mp = null; // TODO: store as char[] & wipe?
     private IvFactory ivFactory;
     private int macSizeBits;
@@ -71,6 +75,10 @@ public class AesGcmEncrypter implements Encrypter {
         this.ivFactory = ivFactory;
     }
 
+    public void setKdf(KeyDerivationFunction kdf) {
+        this.kdf = kdf;
+    }
+
     /**
      * Sets the master password of this encrypter and returns the same encrypter (for builder-like
      * pattern).
@@ -90,9 +98,9 @@ public class AesGcmEncrypter implements Encrypter {
     private byte[] crypt(byte[] input, boolean encrypt) throws DecryptionException {
         assert mp != null;
 
-        // If we're decrypting, we don't want to be re-generating the IV.
-        // Otherwise, we MUST re-generate the IV! GCM requires a unique IV (nonce)
-        byte[] nonce = encrypt ? ivFactory.generateNewIv() : ivFactory.getCurrentIv();
+        // We get the IV from the IV factory, but do not generate it ourselves: this is to allow
+        // calling classes the freedom to generate IVs when they desire.
+        byte[] nonce = ivFactory.getCurrentIv();
 
         // Setup AES cipher in GCM mode
         // N.B. - AESFastEngine has potential side-channel attacks; we do not care about these.
@@ -142,6 +150,11 @@ public class AesGcmEncrypter implements Encrypter {
             // This should NEVER happen
             throw new RuntimeException("Decryption exception during encryption", e.getCause());
         }
+    }
+
+    public byte[] encryptAndRegenerateIv(byte[] input) {
+        this.ivFactory.generateNewIv();
+        return encrypt(input);
     }
 
     @Override
