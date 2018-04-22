@@ -1,7 +1,10 @@
 package uk.co.davidbaxter.letmepass.session;
 
+import java.util.concurrent.Future;
+
 import uk.co.davidbaxter.letmepass.model.PasswordDatabase;
 import uk.co.davidbaxter.letmepass.storage.DataStore;
+import uk.co.davidbaxter.letmepass.model.EncryptedDatabaseSerializer;
 
 public interface SessionContext {
 
@@ -13,16 +16,16 @@ public interface SessionContext {
 
     void setDataStore(DataStore store);
 
-    /* Encrypter getEncrypter(); */
+    EncryptedDatabaseSerializer getEncryptedDatabaseSerializer();
 
-    /* void setEncrypter(Encrypter enc); */
+    void setEncryptedDatabaseSerializer(EncryptedDatabaseSerializer serializer);
 
     String getMasterPassword();
 
     void setMasterPassword(String mp);
 
-    /* Future<Void> encryptAndSaveDb(); */
+    Future<Void> encryptAndSaveDb();
 
-    /* Future<...> readAndDecryptDb(); */
+    Future<Void> readAndDecryptDb();
 
 }
