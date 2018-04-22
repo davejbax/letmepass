@@ -5,24 +5,25 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Stack;
+import java.util.concurrent.Future;
 
 import uk.co.davidbaxter.letmepass.R;
-import uk.co.davidbaxter.letmepass.model.DataEntry;
 import uk.co.davidbaxter.letmepass.model.FolderEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordDatabase;
 import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordDatabaseNavigator;
-import uk.co.davidbaxter.letmepass.model.PasswordEntry;
-import uk.co.davidbaxter.letmepass.model.impl.JsonPasswordDatabase;
+import uk.co.davidbaxter.letmepass.session.SessionContext;
+import uk.co.davidbaxter.letmepass.session.SessionContextRegistry;
+import uk.co.davidbaxter.letmepass.util.AsyncUtils;
+import uk.co.davidbaxter.letmepass.util.Consumer;
 import uk.co.davidbaxter.letmepass.util.SingleLiveEvent;
 import uk.co.davidbaxter.letmepass.util.Triplet;
 
@@ -33,16 +34,16 @@ public class MainViewModel extends ViewModel {
      * Empty container constant to be used wherever an empty container is required, such as when
      * an empty divider is needed.
      */
-    private static final PasswordDatabaseEntryContainer NULL_DIVIDER_CONTAINER
-            = new PasswordDatabaseEntryContainer(R.string.main_divider_empty);
+    private static final PasswordDatabaseEntryContainer NULL_DIVIDER_CONTAINER =
+            new PasswordDatabaseEntryContainer(R.string.main_divider_empty);
 
     //________________________________BOUND LIVEDATA________________________________
     /**
      * LiveData object representing the currently 'stuck' container; this is the one that will be
      * displayed at the top of the list, without moving when scrolling.
      */
-    public final MutableLiveData<PasswordDatabaseEntryContainer> stuckContainer
-            = new MutableLiveData<>();
+    public final MutableLiveData<PasswordDatabaseEntryContainer> stuckContainer =
+            new MutableLiveData<>();
 
     /**
      * The current sorting criteria, as a LiveData object
@@ -90,6 +91,8 @@ public class MainViewModel extends ViewModel {
 
     final SingleLiveEvent<Void> closeEvent = new SingleLiveEvent<>();
 
+    final SingleLiveEvent<Pair<Integer, Object[]>> snackBarMessage = new SingleLiveEvent<>();
+
     //________________________________INTERNALS________________________________
     /**
      * Current display mode -- this does NOT include search results
@@ -97,18 +100,21 @@ public class MainViewModel extends ViewModel {
     DisplayMode currentMode = DisplayMode.EXPLORE;
 
     // TODO: replace with real model
-    JsonPasswordDatabase database = new JsonPasswordDatabase("DB Name",
-            Arrays.asList(
-                    new PasswordEntry("Netflix", "johnsmith", "badpass", "http://netflix.com", ""),
-                    new PasswordEntry("Facebook", "johnsmith", "badpass", "http://facebook.com", ""),
-                    new PasswordEntry("Twitter", "@johnsmith", "badpass", "http://twitter.com", ""),
-                    new DataEntry("Banking Details", "Account no: 1234567890"),
-                    new FolderEntry("School", Arrays.<PasswordDatabaseEntry>asList(
-                            new PasswordEntry("School login", "11jsmith", "badpass1", "", "")
-                    ))
-            ));
+    PasswordDatabase database;
+//    JsonPasswordDatabase database = new JsonPasswordDatabase("DB Name",
+//            Arrays.asList(
+//                    new PasswordEntry("Netflix", "johnsmith", "badpass", "http://netflix.com", ""),
+//                    new PasswordEntry("Facebook", "johnsmith", "badpass", "http://facebook.com", ""),
+//                    new PasswordEntry("Twitter", "@johnsmith", "badpass", "http://twitter.com", ""),
+//                    new DataEntry("Banking Details", "Account no: 1234567890"),
+//                    new FolderEntry("School", Arrays.<PasswordDatabaseEntry>asList(
+//                            new PasswordEntry("School login", "11jsmith", "badpass1", "", "")
+//                    ))
+//            ));
 
-    PasswordDatabaseNavigator navigator = new PasswordDatabaseNavigator(database);
+    PasswordDatabaseNavigator navigator;
+
+    SessionContext sessionContext;
 
     /**
      * List of containers of password entries -- these are transformed from model-returned password
@@ -131,8 +137,16 @@ public class MainViewModel extends ViewModel {
 
     private final MainSortingCallbacks sortingCallbacks = new MainSortingCallbacks(this);
 
-
     public MainViewModel() {
+        this.sessionContext = SessionContextRegistry.getSessionContext();
+        if (this.sessionContext == null || this.sessionContext.getDatabase() == null)
+            throw new IllegalStateException("Session context is not initialized");
+
+        // Set database & create navigator
+        this.database = this.sessionContext.getDatabase();
+        this.navigator = new PasswordDatabaseNavigator(this.database);
+
+        // Initialize LiveData that must start with a non-null value
         this.sortingCriteria.setValue(SortingCriteria.NAME_ASC);
         this.containers = transformIntoContainers(entries);
         this.entries.postValue(this.database.getRootEntries());
@@ -191,6 +205,10 @@ public class MainViewModel extends ViewModel {
 
     public LiveData<Void> getCloseEvent() {
         return closeEvent;
+    }
+
+    public LiveData<Pair<Integer, Object[]>> getSnackBarMessage() {
+        return snackBarMessage;
     }
 
     public MainEntryCallbacks getEntryCallbacks() {
@@ -275,6 +293,32 @@ public class MainViewModel extends ViewModel {
                 this.entries.postValue(this.database.getAllEntriesButFolders());
                 break;
         }
+    }
+
+    public void saveDatabase() {
+        // TODO: consider here whether database ref gets modified during saving: what then?
+        // Deep copy instead? Locks? Synchronized?
+        Future<Void> saveFuture = this.sessionContext.encryptAndSaveDb();
+        AsyncUtils.futureToTask(saveFuture, new Consumer<Void>() {
+            @Override
+            public void accept(Void aVoid) {
+                snackBarMessage.postValue(Pair.create(
+                        R.string.main_db_saved, new Object[] {}
+                ));
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.e(MainViewModel.class.getSimpleName(), "Failed to save DB", t);
+                snackBarMessage.postValue(Pair.create(
+                        R.string.main_error_db_save_failure, new Object[] {}
+                ));
+            }
+        }).execute();
+    }
+
+    public void onFinish() {
+        SessionContextRegistry.discardSessionContext();
     }
 
     /**

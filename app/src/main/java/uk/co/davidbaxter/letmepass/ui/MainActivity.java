@@ -5,15 +5,18 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -91,6 +94,9 @@ public class MainActivity extends AppCompatActivity implements
         // Setup clipboard
         this.setupClipboard();
 
+        // Setup snackbar
+        this.setupSnackbar();
+
         // Listen to close events to close activity if necessary
         this.viewModel.getCloseEvent().observe(this, new Observer<Void>() {
             @Override
@@ -98,6 +104,13 @@ public class MainActivity extends AppCompatActivity implements
                 MainActivity.this.finish();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isFinishing())
+            viewModel.onFinish();
     }
 
     @Override
@@ -203,8 +216,29 @@ public class MainActivity extends AppCompatActivity implements
         if (this.viewModel.getCanGoBack().getValue() != null
                 && this.viewModel.getCanGoBack().getValue())
             this.viewModel.getNavigationCallbacks().onGoBack();
-        else
-            super.onBackPressed();
+        else {
+            // Show a 'are you sure' dialog to stop users accidentally closing the DB when they
+            // don't want to
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle(R.string.main_close_dialog_title)
+                    .setMessage(R.string.main_close_dialog_message)
+                    .setPositiveButton(R.string.main_close_dialog_ok,
+                            new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            MainActivity.super.onBackPressed();
+                        }
+                    })
+                    .setNegativeButton(R.string.main_close_dialog_cancel,
+                            new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .create();
+            dialog.show();
+        }
     }
 
     private void setupPopupMenus() {
@@ -425,6 +459,22 @@ public class MainActivity extends AppCompatActivity implements
                     R.string.main_copied_clipboard,
                     Toast.LENGTH_SHORT)
                 .show();
+            }
+        });
+    }
+
+    private void setupSnackbar() {
+        this.viewModel.getSnackBarMessage().observe(this, new Observer<Pair<Integer, Object[]>>() {
+            @Override
+            public void onChanged(@Nullable Pair<Integer, Object[]> integerPair) {
+                if (integerPair == null)
+                    return;
+
+                Snackbar.make(
+                        findViewById(android.R.id.content),
+                        getString(integerPair.first, integerPair.second),
+                        Snackbar.LENGTH_SHORT
+                ).show();
             }
         });
     }

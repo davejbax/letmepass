@@ -78,6 +78,7 @@ public class MainEntryCallbacks {
     public void onDeleteEntry(PasswordDatabaseEntryContainer container) {
         this.viewModel.database.deleteEntry(container.getEntry());
         this.viewModel.refreshView();
+        this.viewModel.saveDatabase();
     }
 
     public void onNewFolder() {
@@ -115,7 +116,6 @@ public class MainEntryCallbacks {
      * @param container Container containing entry to save
      */
     public void saveEntry(PasswordDatabaseEntryContainer container) {
-        // TODO impl save
         if (this.viewModel.navigator.isAtRoot()) {
             this.viewModel.database.addEntry(container.getEntry());
         } else {
@@ -133,6 +133,9 @@ public class MainEntryCallbacks {
             // TODO: fix bug here: if searching and then adding a new entry, search results will be replaced
             this.viewModel.refreshView();
         }
+
+        // Save the DB
+        this.viewModel.saveDatabase();
     }
 
 }

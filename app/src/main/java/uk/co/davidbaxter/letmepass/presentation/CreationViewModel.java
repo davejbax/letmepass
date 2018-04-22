@@ -4,9 +4,11 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.util.Pair;
 
 import java.util.Collections;
+import java.util.concurrent.Future;
 
 import uk.co.davidbaxter.letmepass.R;
 import uk.co.davidbaxter.letmepass.model.PasswordDatabase;
@@ -19,7 +21,10 @@ import uk.co.davidbaxter.letmepass.session.impl.DefaultSessionContext;
 import uk.co.davidbaxter.letmepass.storage.DataStore;
 import uk.co.davidbaxter.letmepass.storage.impl.DriveDataStore;
 import uk.co.davidbaxter.letmepass.storage.impl.FileDataStore;
+import uk.co.davidbaxter.letmepass.model.impl.VersionedEncryptedDatabaseSerializer;
+import uk.co.davidbaxter.letmepass.ui.CreationActivity;
 import uk.co.davidbaxter.letmepass.util.AsyncUtils;
+import uk.co.davidbaxter.letmepass.util.Consumer;
 import uk.co.davidbaxter.letmepass.util.SingleLiveEvent;
 
 public class CreationViewModel extends ViewModel {
@@ -37,9 +42,11 @@ public class CreationViewModel extends ViewModel {
     private SingleLiveEvent<Boolean> chooseStorageEvent = new SingleLiveEvent<>();
 
     /**
-     * A live event to signal to the view to open the main activity, as the session has been created
+     * A live event to signal to the view to open the main activity, as the session has been
+     * created. True means that creation was successful, false means it was not and the user should
+     * be informed of this.
      */
-    private SingleLiveEvent<Void> launchMainEvent = new SingleLiveEvent<>();
+    private SingleLiveEvent<Boolean> createResult = new SingleLiveEvent<>();
 
     // Bound fields: these are set by the view, and can be read/set by us
     public MutableLiveData<String> masterPassword = new MutableLiveData<>();
@@ -72,8 +79,9 @@ public class CreationViewModel extends ViewModel {
         return chooseStorageEvent;
     }
 
-    public LiveData<Void> getLaunchMainEvent() {
-        return launchMainEvent;
+    // TODO doc
+    public LiveData<Boolean> getCreateResult() {
+        return createResult;
     }
 
     public void onOpenCloud() {
@@ -109,6 +117,10 @@ public class CreationViewModel extends ViewModel {
     }
 
     public void onDriveCreated(DriveDataStore store) {
+        // Delete the cloud store if it exists: otherwise we'll have a bunch of empty files
+        if (this.cloudDataStore != null)
+            this.cloudDataStore.deleteStore();
+
         this.cloudDataStore = store;
         AsyncUtils.futureToLiveData(store.getStoreName(), cloudLocation, false).execute();
     }
@@ -116,6 +128,12 @@ public class CreationViewModel extends ViewModel {
     public void onFileCreated(FileDataStore store) {
         this.deviceDataStore = store;
         AsyncUtils.futureToLiveData(store.getStoreName(), deviceLocation, false).execute();
+    }
+
+    public void onCancel() {
+        // Delete the cloud store if it exists: cloud store makes a blank file due to its nature
+        if (cloudDataStore != null)
+            cloudDataStore.deleteStore();
     }
 
     public void onComplete() {
@@ -131,14 +149,25 @@ public class CreationViewModel extends ViewModel {
         context.setDataStore(dataStore);
         context.setDatabase(database);
         context.setMasterPassword(masterPassword.getValue());
-        // TODO: context.setEncrypter(...)
-        // TODO here: create a SessionContextFactory of some sort? Encrypter will need deps at least
-
-        // Set the session context singleton
+        context.setEncryptedDatabaseSerializer(new VersionedEncryptedDatabaseSerializer());
         SessionContextRegistry.setSessionContext(context);
 
-        // Signal to the view that we are ready to launch the main screen
-        launchMainEvent.postValue(null);
+        // Encrypt and save the database
+        Future<Void> future = context.encryptAndSaveDb();
+        AsyncUtils.futureToTask(future, new Consumer<Void>() {
+            @Override
+            public void accept(Void aVoid) {
+                // Signal to the view we are ready to launch the main screen
+                createResult.postValue(true);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                createResult.postValue(false);
+                Log.e(CreationViewModel.class.getSimpleName(), "Failed to create DB", t);
+            }
+        }).execute();
+        // TODO here: create a SessionContextFactory of some sort? Might be cleaner
     }
 
     public @Nullable Pair<Integer, Object[]> onVerifyStep(int stepId) {

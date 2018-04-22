@@ -21,8 +21,6 @@ public class MainNavigationCallbacks {
      * @param mode The selected mode
      */
     public void onModeSelected(DisplayMode mode) {
-        // TODO: note in practice entries.postValue(model.getEntries()) etc. may be replaced by a
-        // callback so as to not slow the UI
         viewModel.currentMode = mode;
         viewModel.refreshView();
     }
@@ -38,7 +36,6 @@ public class MainNavigationCallbacks {
      * Handles an action of closing the database
      */
     public void onCloseDatabase() {
-        // TODO: in practice, save database? Or, save on each entry addition/edit/deletion?
         this.viewModel.closeEvent.postValue(null);
     }
 

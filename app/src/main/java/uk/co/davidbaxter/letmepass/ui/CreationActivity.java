@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Toast;
 
 import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
@@ -103,6 +104,38 @@ public class CreationActivity extends AppCompatActivity implements StepperLayout
     }
 
     @Override
+    public void onBackPressed() {
+        // Don't do anything if we're in progress (creating DB)
+        if (stepper.isInProgress())
+            return;
+
+        if (this.stepper.getCurrentStepPosition() > 0)
+            this.stepper.onBackClicked();
+        else {
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle(R.string.creation_close_dialog_title)
+                    .setMessage(R.string.creation_close_dialog_message)
+                    .setPositiveButton(R.string.creation_close_dialog_ok,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    viewModel.onCancel();
+                                    CreationActivity.super.onBackPressed();
+                                }
+                            })
+                    .setNegativeButton(R.string.creation_close_dialog_cancel,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            })
+                    .create();
+            dialog.show();
+        }
+    }
+
+    @Override
     public void onError(VerificationError verificationError) {}
 
     @Override
@@ -160,10 +193,21 @@ public class CreationActivity extends AppCompatActivity implements StepperLayout
             }
         });
 
-        this.viewModel.getLaunchMainEvent().observe(this, new Observer<Void>() {
+        this.viewModel.getCreateResult().observe(this, new Observer<Boolean>() {
             @Override
-            public void onChanged(@Nullable Void aVoid) {
-                // TODO
+            public void onChanged(@Nullable Boolean successful) {
+                if (successful != null && successful) {
+                    Intent intent = new Intent(CreationActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    stepper.setTabNavigationEnabled(true);
+                    stepper.hideProgress();
+                    Toast.makeText(CreationActivity.this,
+                            R.string.creation_error_creation_failed,
+                            Toast.LENGTH_LONG)
+                        .show();
+                }
             }
         });
     }

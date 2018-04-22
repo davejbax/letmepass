@@ -10,6 +10,7 @@
     <string name="intro_new">New Database</string>
     <string name="intro_load_cloud">Open from Cloud</string>
     <string name="intro_load_device">Open from Device</string>
+    <string name="intro_drive_error">Failed to open cloud database</string>
 
     <!-- Screen: decryption -->
     <string name="decryption_label">Decrypt Database</string>
@@ -19,6 +20,9 @@
     <string name="decryption_password_hint">Enter password</string>
     <string name="decryption_use_keyfile">This database needs a keyfile</string>
     <string name="decryption_decrypt">Decrypt</string>
+    <string name="decryption_failed">Password incorrect or database corrupt</string>
+    <string name="decryption_error_unknown">An unknown error occurred</string>
+    <string name="decryption_error_corrupt">Database is corrupt</string>
 
     <!-- Screen: creation -->
     <string name="creation_label">Create New Database</string>
@@ -66,6 +70,12 @@
     <string name="creation_dialog_ok">OK</string>
     <string name="creation_creating_db">Creating your database&#8230;</string>
 
+    <!-- Screen: creation - 'are you sure' close dialog -->
+    <string name="creation_close_dialog_title">Are you sure?</string>
+    <string name="creation_close_dialog_message">Are you sure you want to cancel creation?</string>
+    <string name="creation_close_dialog_ok">Yes</string>
+    <string name="creation_close_dialog_cancel">No</string>
+
     <!-- Screen: creation - warnings -->
     <string name="creation_warning_mp_blacklisted">
         This master password is blacklisted, as it is a commonly used password. It is strongly
@@ -86,6 +96,7 @@
     <string name="creation_error_io_error">Could not create file</string>
     <string name="creation_error_file_exists">File already exists</string>
     <string name="creation_error_filename_invalid">File name is invalid</string>
+    <string name="creation_error_creation_failed">Failed to create database</string>
 
     <!-- File picker strings -->
     <string name="file_picker_label">Choose file</string>
@@ -107,6 +118,14 @@
     <string name="main_entry_subtitle_sorted"><b>%1$s</b>: %2$s</string><!-- sorting label, value -->
     <string name="main_entry_subtitle_fav">\u2605 %1$s</string><!-- show a star next to subtitle -->
     <string name="main_copied_clipboard">Copied password to clipboard!</string>
+    <string name="main_db_saved">Saved changes to database</string>
+    <string name="main_error_db_save_failure">Failed to save database</string>
+
+    <!-- Main screen: 'are you sure' close dialog -->
+    <string name="main_close_dialog_title">Are you sure?</string>
+    <string name="main_close_dialog_message">Are you sure you want to exit?</string>
+    <string name="main_close_dialog_ok">Yes</string>
+    <string name="main_close_dialog_cancel">No</string>
 
     <!-- Main screen: search -->
     <string name="main_search_title">Search Passwords</string>
