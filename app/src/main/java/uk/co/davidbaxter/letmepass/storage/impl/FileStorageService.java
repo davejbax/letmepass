@@ -1,5 +1,6 @@
 package uk.co.davidbaxter.letmepass.storage.impl;
 
+import android.app.usage.StorageStats;
 import android.content.Context;
 import android.content.Intent;
 
@@ -22,8 +23,6 @@ import uk.co.davidbaxter.letmepass.ui.FilePickerActivity;
  * data directory.
  */
 public class FileStorageService {
-
-    private static final String FILE_EXTENSION = "lmpdb";
 
     private Context context;
 
@@ -48,7 +47,7 @@ public class FileStorageService {
      */
     public Intent getFilePickerIntent() {
         Intent intent = new Intent(context, FilePickerActivity.class);
-        intent.putExtra(FilePickerActivity.EXTRA_EXTENSION, FILE_EXTENSION);
+        intent.putExtra(FilePickerActivity.EXTRA_EXTENSION, StorageConstants.EXTENSION);
         return intent;
     }
 
@@ -125,7 +124,7 @@ public class FileStorageService {
     }
 
     private String getFullFileName(String fileName) {
-        return fileName + "." + FILE_EXTENSION;
+        return fileName + "." + StorageConstants.EXTENSION;
     }
 
     // TODO:

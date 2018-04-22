@@ -165,6 +165,7 @@
     <string name="drive_create_cancelled">Cloud file creation cancelled</string>
     <string name="drive_create_failed">Failed to create cloud file</string>
     <string name="drive_internal_error">Cloud storage failed</string>
+    <string name="drive_open_file_title">Open database</string>
 
     <!-- Other global strings -->
     <string name="pwd_flags_good_length">Minimum 12 characters</string>

@@ -17,9 +17,13 @@ import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResourceClient;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.OpenFileActivityOptions;
+import com.google.android.gms.drive.query.Filters;
+import com.google.android.gms.drive.query.SearchableField;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+
+import uk.co.davidbaxter.letmepass.R;
 
 public class DriveStorageService {
 
@@ -161,6 +165,55 @@ public class DriveStorageService {
      * @return TODO
      */
     public DriveDataStore onCreateFileResult(Intent data) {
+        return new DriveDataStore(
+                this,
+                data.<DriveId>getParcelableExtra(OpenFileActivityOptions.EXTRA_RESPONSE_DRIVE_ID)
+        );
+    }
+
+    /**
+     * Gets an {@link IntentSender} to open an open file dialog for Drive. This is asynchronous,
+     * and so a callback is required to receive the result. This may also fail, in which case the
+     * failure method of the callback will be invoked.
+     * <p>
+     * If the creation of the IntentSender is successful, it should be launched with
+     * startActivityForResult of {@link android.app.Activity}. The result of this, if the result
+     * was OK, should then be processed with {@link #onOpenFileResult(Intent)}.
+     *
+     * @param callback Callback to use
+     */
+    public void getOpenFileIntent(final Callback<IntentSender> callback) {
+        // Set options for the open file dialog: we filter by extension for now (although we cannot
+        // check if titles endWith, just contain, due to API limitations).
+        OpenFileActivityOptions openOptions = new OpenFileActivityOptions.Builder()
+                .setSelectionFilter(
+                        Filters.contains(SearchableField.TITLE, StorageConstants.EXTENSION)) // TODO: don't do this, or enforce extension in creation
+                .setActivityTitle(context.getString(R.string.drive_open_file_title))
+                .build();
+
+        // Try to create a new open file activity intent sender
+        driveClient.newOpenFileActivityIntentSender(openOptions)
+                .addOnSuccessListener(new OnSuccessListener<IntentSender>() {
+                    @Override
+                    public void onSuccess(IntentSender intentSender) {
+                        callback.onSuccess(intentSender);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onFailure(e);
+                    }
+                });
+    }
+
+    /**
+     * Processes the result of an open file intent
+     *
+     * @param data The data returned by the launched activity
+     * @return A {@link DriveDataStore} of the opened file
+     */
+    public DriveDataStore onOpenFileResult(Intent data) {
         return new DriveDataStore(
                 this,
                 data.<DriveId>getParcelableExtra(OpenFileActivityOptions.EXTRA_RESPONSE_DRIVE_ID)
