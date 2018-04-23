@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements
         SearchView.OnQueryTextListener,
         MenuItem.OnActionExpandListener,
         NavigationView.OnNavigationItemSelectedListener {
+
+    private static final String ENTRY_DIALOG_TAG = EntryDialogFragment.class.getSimpleName();
 
     private DrawerLayout drawerLayout = null;
 
@@ -213,10 +216,15 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        if (this.viewModel.getCanGoBack().getValue() != null
-                && this.viewModel.getCanGoBack().getValue())
+        // First check: are we in an edit/view entry dialog? If so, exit this first and foremost
+        if (isDialogOpen()) {
+            super.onBackPressed();
+        // Second check: are we in a folder? If so, back should go to parent folder
+        } else if (this.viewModel.getCanGoBack().getValue() != null
+                && this.viewModel.getCanGoBack().getValue()) {
             this.viewModel.getNavigationCallbacks().onGoBack();
-        else {
+        // Otherwise, we're good to ask whether to back out of the application
+        } else {
             // Show a 'are you sure' dialog to stop users accidentally closing the DB when they
             // don't want to
             AlertDialog dialog = new AlertDialog.Builder(this)
@@ -239,6 +247,11 @@ public class MainActivity extends AppCompatActivity implements
                     .create();
             dialog.show();
         }
+    }
+
+    private boolean isDialogOpen() {
+        Fragment dialogFrag = getSupportFragmentManager().findFragmentByTag(ENTRY_DIALOG_TAG);
+        return dialogFrag != null && dialogFrag.isVisible();
     }
 
     private void setupPopupMenus() {
@@ -435,11 +448,11 @@ public class MainActivity extends AppCompatActivity implements
                     getSupportFragmentManager()
                             .beginTransaction()
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                            .replace(R.id.drawerLayoutMain, dialogFragment)
+                            .replace(R.id.drawerLayoutMain, dialogFragment, ENTRY_DIALOG_TAG)
                             .addToBackStack(null) // Makes transaction reversible
                             .commit();
                 } else {
-                    dialogFragment.show(getSupportFragmentManager(), "EntryDialogFragment");
+                    dialogFragment.show(getSupportFragmentManager(), ENTRY_DIALOG_TAG);
                 }
             }
         });
