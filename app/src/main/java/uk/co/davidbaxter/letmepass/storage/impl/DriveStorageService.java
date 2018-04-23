@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -105,8 +106,10 @@ public class DriveStorageService {
     /**
      * Processes the result of a sign in intent as created using {@link #getSignInIntent()}.
      * @param data Intent result data
+     * @throws Exception if an API exception occurred; the cause is set to the underlying
+     *                   {@link ApiException}.
      */
-    public void onSignInResult(Intent data) {
+    public void onSignInResult(Intent data) throws Exception {
         try {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             GoogleSignInAccount signInAccount = task.getResult(ApiException.class);
@@ -114,7 +117,7 @@ public class DriveStorageService {
             this.driveClient = Drive.getDriveClient(context, signInAccount);
             this.driveResourceClient = Drive.getDriveResourceClient(context, signInAccount);
         } catch (ApiException e) {
-            // TODO: handle exception
+            throw new Exception(e);
         }
     }
 

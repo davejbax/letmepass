@@ -70,8 +70,13 @@ public class CreationActivity extends AppCompatActivity implements StepperLayout
                     return;
                 // No errors, continue with creating drive file
                 } else {
-                    driveStorageService.onSignInResult(data);
-                    this.createDriveFile();
+                    try {
+                        driveStorageService.onSignInResult(data);
+                        this.createDriveFile();
+                    } catch (Exception e) {
+                        showError(R.string.drive_sign_in_failed);
+                        Log.e(getClass().getSimpleName(), "Failed to sign into Drive", e);
+                    }
                 }
 
                 // Hide progress if we were waiting on this intent

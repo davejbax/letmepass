@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Toast;
 
 import uk.co.davidbaxter.letmepass.R;
 import uk.co.davidbaxter.letmepass.databinding.ActivityIntroBinding;
@@ -66,9 +65,14 @@ public class IntroActivity extends AppCompatActivity {
                 break;
             case REQUEST_CLOUD_SIGN_IN_AND_OPEN_CLOUD:
                 if (resultCode == RESULT_OK) {
-                    // Process result and then launch open dialog
-                    driveStorageService.onSignInResult(data);
-                    openDriveFile();
+                    try {
+                        driveStorageService.onSignInResult(data);
+                        // Process result and then launch open dialog
+                        openDriveFile();
+                    } catch (Exception e) {
+                        showSnackbar(R.string.drive_sign_in_failed);
+                        Log.e(getClass().getSimpleName(), "Failed to sign into Drive", e);
+                    }
                 }
                 break;
             case REQUEST_OPEN_CLOUD:
