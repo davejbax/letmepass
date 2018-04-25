@@ -12,6 +12,8 @@ import java.util.Date;
 import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordFlags;
+import uk.co.davidbaxter.letmepass.security.PasswordGeneratorService;
+import uk.co.davidbaxter.letmepass.security.SecurityServices;
 import uk.co.davidbaxter.letmepass.util.SingleLiveEvent;
 
 /**
@@ -62,9 +64,13 @@ public class EntryDialogViewModel extends ViewModel {
      */
     private final boolean startedAsEditable;
 
+    private final SecurityServices securityServices;
+
     private EntryDialogViewModel(PasswordDatabaseEntryContainer container,
-                                 boolean editable) {
+                                 boolean editable,
+                                 SecurityServices securityServices) {
         this.startedAsEditable = editable;
+        this.securityServices = securityServices;
         this.editable.setValue(editable);
         this.container = container;
         this.workingEntry.setValue((PasswordDatabaseEntry) container.getEntry().clone());
@@ -151,6 +157,28 @@ public class EntryDialogViewModel extends ViewModel {
         passwordFlags.postValue(flags);
     }
 
+    public void onGeneratePassword() {
+        // If we shouldn't be able to generate a password, do nothing
+        if (!hasGeneratePassword())
+            return;
+
+        // Generate a new password
+        String pwd = securityServices.getPasswordGeneratorService()
+                .getPasswordGenerator()
+                .generate();
+
+        // Set the password on our entry and update in view
+        PasswordEntry entry = (PasswordEntry) this.workingEntry.getValue();
+        entry.password = pwd;
+        this.workingEntry.postValue(entry);
+    }
+
+    public boolean hasGeneratePassword() {
+        return this.editable.getValue() != null
+                && this.editable.getValue()
+                && this.container.getEntry().getType().equals(PasswordEntry.TYPE);
+    }
+
     /**
      * Handles a switch to 'edit' mode for the entry
      */
@@ -206,10 +234,14 @@ public class EntryDialogViewModel extends ViewModel {
 
         private final PasswordDatabaseEntryContainer container;
         private final boolean editable;
+        private final SecurityServices securityServices;
 
-        public Factory(PasswordDatabaseEntryContainer container, boolean editable) {
+        public Factory(PasswordDatabaseEntryContainer container,
+                       boolean editable,
+                       SecurityServices securityServices) {
             this.container = container;
             this.editable = editable;
+            this.securityServices = securityServices;
         }
 
         @NonNull
@@ -220,7 +252,7 @@ public class EntryDialogViewModel extends ViewModel {
                         "Class must be instance of EntryDialogViewModel"
                 );
 
-            return (T) new EntryDialogViewModel(container, editable);
+            return (T) new EntryDialogViewModel(container, editable, securityServices);
         }
 
     }

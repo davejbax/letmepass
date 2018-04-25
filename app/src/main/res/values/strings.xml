@@ -155,6 +155,7 @@
     <string name="entry_dialog_save_btn">Save changes</string>
     <string name="entry_dialog_cancel_btn">Cancel</string>
     <string name="entry_dialog_close_btn">Close</string>
+    <string name="entry_dialog_generate_btn">Generate password</string>
 
     <string name="label_entry_name">Name</string>
     <string name="hint_entry_name">Name</string>

@@ -20,6 +20,8 @@ import uk.co.davidbaxter.letmepass.model.PasswordEntry;
 import uk.co.davidbaxter.letmepass.presentation.MainViewModel;
 import uk.co.davidbaxter.letmepass.presentation.PasswordDatabaseEntryContainer;
 import uk.co.davidbaxter.letmepass.presentation.EntryDialogViewModel;
+import uk.co.davidbaxter.letmepass.security.PasswordGeneratorService;
+import uk.co.davidbaxter.letmepass.security.SecurityServices;
 
 public class EntryDialogFragment extends DialogFragment {
 
@@ -47,7 +49,10 @@ public class EntryDialogFragment extends DialogFragment {
         // Obtain our own view model to deal with our own presentation and actions; we need to
         // use a factory to get this,
         this.viewModel = ViewModelProviders
-                .of(this, new EntryDialogViewModel.Factory(container, editable))
+                .of(this, new EntryDialogViewModel.Factory(
+                        container,
+                        editable,
+                        SecurityServices.getInstance(getContext().getApplicationContext())))
                 .get(EntryDialogViewModel.class);
 
         // Observe for close events, to close the dialog

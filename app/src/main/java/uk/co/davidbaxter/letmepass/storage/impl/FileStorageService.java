@@ -1,12 +1,12 @@
 package uk.co.davidbaxter.letmepass.storage.impl;
 
-import android.app.usage.StorageStats;
 import android.content.Context;
 import android.content.Intent;
 
 import java.io.File;
 import java.io.IOException;
 
+import uk.co.davidbaxter.letmepass.storage.StorageConstants;
 import uk.co.davidbaxter.letmepass.ui.FilePickerActivity;
 
 /**
