@@ -21,12 +21,6 @@ public class HybridIvFactoryTest {
                 .getInt();
     }
 
-    private void printBytes(byte[] fourBytes) {
-        for (byte b : fourBytes)
-            System.out.printf("%02x", b);
-        System.out.println();
-    }
-
     @Test
     public void generates_SequentialPart() {
         HybridIvFactory factory = new HybridIvFactory();

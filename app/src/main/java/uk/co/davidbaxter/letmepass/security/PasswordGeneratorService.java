@@ -36,22 +36,22 @@ public class PasswordGeneratorService {
     public void reloadFromSettings() {
         // Load settings from shared preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        int minLength = prefs.getInt(StorageConstants.PREFS_GEN_MIN_LEN,
-                StorageConstants.PREFS_GEN_MIN_LEN_DEF);
-        int maxLength = prefs.getInt(StorageConstants.PREFS_GEN_MAX_LEN,
-                StorageConstants.PREFS_GEN_MAX_LEN_DEF);
-        boolean upper = prefs.getBoolean(StorageConstants.PREFS_GEN_UPPER,
-                StorageConstants.PREFS_GEN_UPPER_DEF);
-        boolean lower = prefs.getBoolean(StorageConstants.PREFS_GEN_LOWER,
-                StorageConstants.PREFS_GEN_LOWER_DEF);
-        boolean symbols = prefs.getBoolean(StorageConstants.PREFS_GEN_SYMBOLS,
-                StorageConstants.PREFS_GEN_SYMBOLS_DEF);
-        boolean numbers = prefs.getBoolean(StorageConstants.PREFS_GEN_NUMBERS,
-                StorageConstants.PREFS_GEN_NUMBERS_DEF);
 
-        // Construct a new password generator
-        this.passwordGenerator = new PasswordGenerator(minLength, maxLength, symbols, numbers,
-                upper, lower);
+        // Construct a new password generator, retrieving the parameters from shared preferences
+        this.passwordGenerator = new PasswordGenerator.Builder()
+            .minLength(prefs.getInt(StorageConstants.PREFS_GEN_MIN_LEN,
+                    StorageConstants.PREFS_GEN_MIN_LEN_DEF))
+            .maxLength(prefs.getInt(StorageConstants.PREFS_GEN_MAX_LEN,
+                    StorageConstants.PREFS_GEN_MAX_LEN_DEF))
+            .upper(prefs.getBoolean(StorageConstants.PREFS_GEN_UPPER,
+                    StorageConstants.PREFS_GEN_UPPER_DEF))
+            .lower(prefs.getBoolean(StorageConstants.PREFS_GEN_LOWER,
+                    StorageConstants.PREFS_GEN_LOWER_DEF))
+            .symbols(prefs.getBoolean(StorageConstants.PREFS_GEN_SYMBOLS,
+                    StorageConstants.PREFS_GEN_SYMBOLS_DEF))
+            .numbers(prefs.getBoolean(StorageConstants.PREFS_GEN_NUMBERS,
+                    StorageConstants.PREFS_GEN_NUMBERS_DEF))
+            .create();
     }
 
 }
