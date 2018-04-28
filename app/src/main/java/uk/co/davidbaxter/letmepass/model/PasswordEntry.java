@@ -1,5 +1,6 @@
 package uk.co.davidbaxter.letmepass.model;
 
+/** A password entry in a password database */
 public class PasswordEntry extends PasswordDatabaseEntry {
 
     public static final String TYPE = "password";
@@ -41,8 +42,13 @@ public class PasswordEntry extends PasswordDatabaseEntry {
         this.description = pEntry.description;
     }
 
+    /**
+     * Constructs a new empty password entry; this should ONLY be used if there is no
+     * means of generating a password available.
+     * @return New empty entry with a set name and password
+     */
     public static PasswordEntry newEmptyEntry() {
-        return new PasswordEntry("New password", "", "TODO", "", "");
+        return new PasswordEntry("New password", "", "CHANGE ME", "", "");
     }
 
     // TODO: impl additional fields

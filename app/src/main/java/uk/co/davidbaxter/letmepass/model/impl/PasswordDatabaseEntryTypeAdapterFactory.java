@@ -14,6 +14,14 @@ import uk.co.davidbaxter.letmepass.model.FolderEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordEntry;
 
+/**
+ * A {@link TypeAdapterFactory} for {@link PasswordDatabaseEntry} classes.
+ * <p>
+ * This class is used in Gson (de)serialization, as the serialization of PasswordDatabaseEntry
+ * classes must be such that they are deserialized correctly into the appropriate subclass. The
+ * class also adds a type in the JSON to identify the subclass (since this information is not
+ * encoded otherwise).
+ */
 public class PasswordDatabaseEntryTypeAdapterFactory implements TypeAdapterFactory {
 
     @Override
@@ -27,7 +35,18 @@ public class PasswordDatabaseEntryTypeAdapterFactory implements TypeAdapterFacto
         return (TypeAdapter<T>) newPdeAdapter(gson);
     }
 
+    /**
+     * Creates a PasswordDatabaseEntry {@link com.google.gson.TypeAdapter} for the given Gson.
+     * <p>
+     * This TypeAdapter writes and reads JSON for PasswordDatabaseEntry classes. An array is used
+     * to store first the type of the entry and next the entry itself. Reading and writing of the
+     * JSON itself for the subclasses of PDE is done by delegation to Gson.
+     *
+     * @param gson Gson instance for which to create the adapter
+     * @return TypeAdapter for PDEs
+     */
     private TypeAdapter<PasswordDatabaseEntry> newPdeAdapter(Gson gson) {
+        // Get all of the delegates for each type
         final TypeAdapter<FolderEntry> folderDelegate = gson.getDelegateAdapter(this,
                 TypeToken.get(FolderEntry.class));
         final TypeAdapter<DataEntry> dataDelegate = gson.getDelegateAdapter(this,
@@ -38,9 +57,10 @@ public class PasswordDatabaseEntryTypeAdapterFactory implements TypeAdapterFacto
         return new TypeAdapter<PasswordDatabaseEntry>() {
             @Override
             public void write(JsonWriter out, PasswordDatabaseEntry value) throws IOException {
-                out.beginArray();
-                out.value(value.getType());
+                out.beginArray(); // Start writing an array
+                out.value(value.getType()); // Write first value in array (type name)
 
+                // Deduce the correct delegate TypeAdapter to use
                 TypeAdapter delegate = null;
                 switch (value.getType()) {
                     case FolderEntry.TYPE:
@@ -54,15 +74,17 @@ public class PasswordDatabaseEntryTypeAdapterFactory implements TypeAdapterFacto
                         break;
                 }
 
+                // Delegate writing the entry's fields to the delegate adapter
                 delegate.write(out, value);
                 out.endArray();
             }
 
             @Override
             public PasswordDatabaseEntry read(JsonReader in) throws IOException {
-                in.beginArray();
-                String type = in.nextString();
+                in.beginArray(); // Begin reading an array
+                String type = in.nextString(); // Read type of entry
 
+                // Deduce delegate to use from found type
                 TypeAdapter delegate = null;
                 switch (type) {
                     case FolderEntry.TYPE:
@@ -76,6 +98,7 @@ public class PasswordDatabaseEntryTypeAdapterFactory implements TypeAdapterFacto
                         break;
                 }
 
+                // Read entry using delegate TypeAdapter
                 PasswordDatabaseEntry entry = (PasswordDatabaseEntry) delegate.read(in);
                 in.endArray();
 

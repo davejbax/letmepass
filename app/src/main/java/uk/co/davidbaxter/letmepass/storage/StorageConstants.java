@@ -1,9 +1,14 @@
 package uk.co.davidbaxter.letmepass.storage;
 
+/**
+ * A collection of storage constants
+ */
 public class StorageConstants {
 
+    /** File extension for databases */
     public static final String EXTENSION = "lmpdb";
 
+    // Preference keys and default values
     public static final String PREFS_GEN_MIN_LEN = "minLength";
     public static final int PREFS_GEN_MIN_LEN_DEF = 16;
     public static final String PREFS_GEN_MAX_LEN = "maxLength";

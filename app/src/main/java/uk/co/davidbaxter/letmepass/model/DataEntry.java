@@ -1,5 +1,6 @@
 package uk.co.davidbaxter.letmepass.model;
 
+/** A data entry in a password database */
 public class DataEntry extends PasswordDatabaseEntry {
 
     public static final String TYPE = "data";
@@ -34,7 +35,5 @@ public class DataEntry extends PasswordDatabaseEntry {
     public static DataEntry newEmptyEntry() {
         return new DataEntry("New data", "Enter any text here!");
     }
-
-    // TODO: impl additional fields
 
 }

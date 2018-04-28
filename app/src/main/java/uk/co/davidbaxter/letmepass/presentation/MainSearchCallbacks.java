@@ -8,27 +8,31 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import uk.co.davidbaxter.letmepass.R;
+import uk.co.davidbaxter.letmepass.util.DebounceUtils;
 
 /**
  * Callbacks for the search functionality of the main view, as part of the MainViewModel
  */
 public class MainSearchCallbacks {
+//
+//    /**
+//     * How long in ms to wait after the user types a character to execute the search query. If they
+//     * type another character in this time, the timer resets.
+//     */
+//    private static final int SEARCH_DEBOUNCE_TIME = 400;
+//
+//    /**
+//     * Threaded scheduler service to run search debounce tasks in a scheduled fashion.
+//     */
+//    private final ScheduledExecutorService searchExecutor = Executors.newScheduledThreadPool(1);
+//
+//    /**
+//     * Current search debounce task; may be cancelled, and may be null.
+//     */
+//    private ScheduledFuture<?> searchDebounce = null;
+    private static final String DEBOUNCE_KEY_SEARCH = "search";
 
-    /**
-     * How long in ms to wait after the user types a character to execute the search query. If they
-     * type another character in this time, the timer resets.
-     */
-    private static final int SEARCH_DEBOUNCE_TIME = 400;
-
-    /**
-     * Threaded scheduler service to run search debounce tasks in a scheduled fashion.
-     */
-    private final ScheduledExecutorService searchExecutor = Executors.newScheduledThreadPool(1);
-
-    /**
-     * Current search debounce task; may be cancelled, and may be null.
-     */
-    private ScheduledFuture<?> searchDebounce = null;
+    private static final int DEBOUNCE_TIME_MS = 400;
 
     private final MainViewModel viewModel;
 
@@ -49,11 +53,9 @@ public class MainSearchCallbacks {
         }
 
         // Cancel any debounce timers as we are done typing
-        if (this.searchDebounce != null)
-            this.searchDebounce.cancel(true);
+        DebounceUtils.cancel(this, DEBOUNCE_KEY_SEARCH);
 
         // Retrieve search results from the model
-        // TODO: in practice, use a Callback to post this value: i.e. model takes a callback arg
         viewModel.entries.postValue(viewModel.database.search(query));
 
         // Update title and recreate containers to update view
@@ -75,17 +77,14 @@ public class MainSearchCallbacks {
             return;
         }
 
-        // Forcefully cancel currently scheduled debounce timer
-        if (this.searchDebounce != null)
-            this.searchDebounce.cancel(true);
-
         // Schedule a new debounce task to carry out the query after the user is 'done' typing
-        this.searchDebounce = this.searchExecutor.schedule(new Runnable() {
+        // (this cancels any existing debounce and runs asynchronously).
+        DebounceUtils.debounce(this, DEBOUNCE_KEY_SEARCH, DEBOUNCE_TIME_MS, new Runnable() {
             @Override
             public void run() {
                 onSearchSubmit(query);
             }
-        }, SEARCH_DEBOUNCE_TIME, TimeUnit.MILLISECONDS);
+        });
     }
 
     /**
@@ -93,8 +92,7 @@ public class MainSearchCallbacks {
      */
     public void onSearchClose() {
         // Cancel any debounce task as we are done searching
-        if (this.searchDebounce != null)
-            this.searchDebounce.cancel(true);
+        DebounceUtils.cancel(this, DEBOUNCE_KEY_SEARCH);
 
         // Update screen title to default and display all entries again (mimic screen selected call)
         viewModel.getNavigationCallbacks().onModeSelected(viewModel.currentMode);

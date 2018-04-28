@@ -2,6 +2,10 @@ package uk.co.davidbaxter.letmepass.presentation;
 
 import uk.co.davidbaxter.letmepass.R;
 
+/**
+ * An enum representing criteria that a list of
+ * {@link uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry} objects may be sorted by.
+ */
 public enum SortingCriteria {
 
     NAME_ASC(true, R.string.main_sort_name),

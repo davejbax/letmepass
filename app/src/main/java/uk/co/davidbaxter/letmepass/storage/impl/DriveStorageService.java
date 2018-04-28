@@ -26,6 +26,13 @@ import com.google.android.gms.tasks.Task;
 import uk.co.davidbaxter.letmepass.R;
 import uk.co.davidbaxter.letmepass.storage.StorageConstants;
 
+/**
+ * A service for interacting with Google Drive storage APIs. This provides methods to sign in,
+ * create files, and load files.
+ * <p>
+ * This service works with a flow of {@link Intent} objects. Generally, they should be obtained for
+ * the desired action with getter methods, and processed using the onResult methods of the class.
+ */
 public class DriveStorageService {
 
     /**

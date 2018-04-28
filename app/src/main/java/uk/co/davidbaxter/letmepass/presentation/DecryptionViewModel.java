@@ -18,10 +18,13 @@ import uk.co.davidbaxter.letmepass.util.SingleLiveEvent;
 
 public class DecryptionViewModel extends ViewModel {
 
-    // String resource ID or null for success
+    /** Event of decryption result as an error string resource ID or null for success */
     private SingleLiveEvent<Integer> decryptionResult = new SingleLiveEvent<>();
 
+    /** Master password that may be bound to view */
     public MutableLiveData<String> masterPassword = new MutableLiveData<>();
+
+    /** Whether to use keyfile (may be bound to view) */
     public MutableLiveData<Boolean> useKeyfile = new MutableLiveData<>();
 
     public void onDecrypt() {
@@ -60,6 +63,11 @@ public class DecryptionViewModel extends ViewModel {
         }).execute();
     }
 
+    /**
+     * Gets the LiveData for the decryption result, which emits a string resource ID for an error
+     * message if there was an error, and null if the decryption succeeded.
+     * @return Decryption result LiveData
+     */
     public LiveData<Integer> getDecryptionResult() {
         return decryptionResult;
     }

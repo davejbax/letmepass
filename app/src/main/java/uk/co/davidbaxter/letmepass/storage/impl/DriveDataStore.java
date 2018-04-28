@@ -25,6 +25,9 @@ import java.util.concurrent.TimeoutException;
 
 import uk.co.davidbaxter.letmepass.storage.DataStore;
 
+/**
+ * A {@link DataStore} backed by Google Drive storage
+ */
 public class DriveDataStore implements DataStore {
 
     private byte[] cachedData = null;
@@ -129,6 +132,15 @@ public class DriveDataStore implements DataStore {
         return new FutureTaskLink<>(openFileTask);
     }
 
+    /**
+     * A class linking {@link Future} and {@link Task} objects, as a single Future implementation.
+     * <p>
+     * This future will have its value once the task's {@link OnSuccessListener} is invoked. If the
+     * task fails, the Future will throw an ExecutionException when it is retrieved. If the task is
+     * cancelled, the Future will throw an InterruptedException.
+     *
+     * @param <T> Type returned by the task
+     */
     private static class FutureTaskLink<T> implements Future<T>, OnSuccessListener<T>,
             OnFailureListener, OnCanceledListener {
 
@@ -138,6 +150,10 @@ public class DriveDataStore implements DataStore {
         private boolean cancelled = false;
         private final Object notifyObj = new Object();
 
+        /**
+         * Creates a FutureTaskLink for the given task
+         * @param task Task to bind to
+         */
         public FutureTaskLink(Task<T> task) {
             this.task = task;
             this.task.addOnSuccessListener(this);
@@ -237,6 +253,12 @@ public class DriveDataStore implements DataStore {
         }
     }
 
+    /**
+     * A simple abstract {@link Future} class to transform a Future object into a different type.
+     *
+     * @param <T> Source type
+     * @param <U> Target type to transform to
+     */
     private static abstract class FutureTransformer<T, U> implements Future<U> {
 
         private Future<T> source;

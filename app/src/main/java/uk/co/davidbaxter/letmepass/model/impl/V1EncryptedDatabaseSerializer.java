@@ -21,18 +21,24 @@ import uk.co.davidbaxter.letmepass.model.PasswordDatabase;
 import uk.co.davidbaxter.letmepass.model.EncryptedDatabaseSerializer;
 import uk.co.davidbaxter.letmepass.model.SerializationException;
 
+/**
+ * An {@link EncryptedDatabaseSerializer} for version 1 of the DB format
+ */
 public class V1EncryptedDatabaseSerializer implements EncryptedDatabaseSerializer {
 
     private static final short VERSION = 1;
-    private static final int ARGON_ITERATIONS = 10;
-    private static final int ARGON_MEMORY = 65536;
-    private static final int ARGON_PARALLELISM = 2;
-    private static final int ARGON_SALT_LEN = 16;
-    private static final int AES_KEY_LEN_BYTES = 32; // 256-bit
+    private static final int ARGON_ITERATIONS = 10;  // 10 iterations
+    private static final int ARGON_MEMORY = 65536;   // 65MiB
+    private static final int ARGON_PARALLELISM = 2;  // 2 threads
+    private static final int ARGON_SALT_LEN = 16;    // 128-bit salt
+    private static final int AES_KEY_LEN_BYTES = 32; // 256-bit hash length (for AES-256)
 
     private HybridIvFactory newIvFactory;
     private Argon2KeyDerivationFunction kdf;
 
+    /**
+     * Constructs a new V1EncryptedDatabaseSerializer
+     */
     public V1EncryptedDatabaseSerializer() {
         this.newIvFactory = new HybridIvFactory();
         this.kdf = new Argon2KeyDerivationFunction(ARGON_ITERATIONS, ARGON_MEMORY,
@@ -139,6 +145,12 @@ public class V1EncryptedDatabaseSerializer implements EncryptedDatabaseSerialize
         }
     }
 
+    /**
+     * Attempts to gzip a payload
+     * @param payload Payload to gzip
+     * @return Gzipped payload
+     * @throws IOException If the payload could not be gzipped
+     */
     private byte[] gzip(byte[] payload) throws IOException {
         GZIPOutputStream gzipOut = null;
         try {
@@ -261,7 +273,6 @@ public class V1EncryptedDatabaseSerializer implements EncryptedDatabaseSerialize
                     .putInt(this.argonParallelism)
                     .putShort((short) this.argonSalt.length);
 
-            System.out.println(buff.capacity() + ", " + buff.remaining());
             buff.put(this.argonSalt, 0, this.argonSalt.length);
             buff.rewind();
             buff.get(header);

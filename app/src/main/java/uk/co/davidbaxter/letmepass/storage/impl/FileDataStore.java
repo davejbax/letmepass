@@ -17,6 +17,12 @@ import java.util.concurrent.Future;
 import uk.co.davidbaxter.letmepass.storage.DataStore;
 import uk.co.davidbaxter.letmepass.util.InstantFuture;
 
+/**
+ * A {@link DataStore} backed by a file in internal storage.
+ * <p>
+ * Note that the store name can be retrieved instantly and that the {@link #getStoreName()} returns
+ * a non-blocking, completed {@link Future}.
+ */
 public class FileDataStore implements DataStore {
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();

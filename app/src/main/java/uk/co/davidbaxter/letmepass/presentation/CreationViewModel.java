@@ -80,12 +80,22 @@ public class CreationViewModel extends ViewModel {
         this.cloudChecked.postValue(cloudChecked);
     }
 
-    // TODO doc
+    /**
+     * Gets the LiveData emitting an event each time that the user opts to choose a file from
+     * some storage medium. The value of this event is true if the user has chosen to pick a file
+     * from the cloud, and false if the user has chosen to pick a file from the device.
+     * @return Event of user choosing to 'choose storage file' (for cloud or device)
+     */
     public LiveData<Boolean> getChooseStorageEvent() {
         return chooseStorageEvent;
     }
 
-    // TODO doc
+    /**
+     * Gets the LiveData representing the result of creating the database. The value of this is true
+     * if the database was created successfully, in which case the main activity should be launched,
+     * and false otherwise.
+     * @return Create result LiveData
+     */
     public LiveData<Boolean> getCreateResult() {
         return createResult;
     }

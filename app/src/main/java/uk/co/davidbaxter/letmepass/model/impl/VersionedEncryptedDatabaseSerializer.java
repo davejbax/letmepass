@@ -7,16 +7,28 @@ import uk.co.davidbaxter.letmepass.model.PasswordDatabase;
 import uk.co.davidbaxter.letmepass.model.EncryptedDatabaseSerializer;
 import uk.co.davidbaxter.letmepass.model.SerializationException;
 
+/**
+ * An {@link EncryptedDatabaseSerializer} that reads the version of the file format from the
+ * header of the data, and chooses the implementation accordingly.
+ */
 public class VersionedEncryptedDatabaseSerializer implements EncryptedDatabaseSerializer {
 
     private static final int VERSION_1 = 1;
     private static final int LATEST_VERSION = VERSION_1;
     private EncryptedDatabaseSerializer serializer;
 
+    /**
+     * Creates a VersionedEncryptedDatabaseSerializer that will serialize data to the latest
+     * version of the DB format.
+     */
     public VersionedEncryptedDatabaseSerializer() {
         this(LATEST_VERSION);
     }
 
+    /**
+     * Creates a VersionedEncryptedDatabaseSerializer to serialize data to the given version
+     * @param version Version of format to serialize to
+     */
     public VersionedEncryptedDatabaseSerializer(int version) {
         switch (version) {
             case VERSION_1:

@@ -8,6 +8,7 @@ import uk.co.davidbaxter.letmepass.R;
 import uk.co.davidbaxter.letmepass.model.DataEntry;
 import uk.co.davidbaxter.letmepass.model.FolderEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordEntry;
+import uk.co.davidbaxter.letmepass.security.SecurityServices;
 import uk.co.davidbaxter.letmepass.util.Triplet;
 
 /**
@@ -96,8 +97,17 @@ public class MainEntryCallbacks {
     }
 
     public void onNewPassword() {
+        String generatedPwd = SecurityServices
+                .getInstance()
+                .getPasswordGeneratorService()
+                .getPasswordGenerator()
+                .generate();
         this.viewModel.dialog.postValue(new Pair<PasswordDatabaseEntryContainer, Boolean>(
-                new PasswordDatabaseEntryContainer(PasswordEntry.newEmptyEntry(), null),
+                new PasswordDatabaseEntryContainer(
+                        new PasswordEntry(
+                            "New password", "", generatedPwd, "", ""
+                        ),
+                        null),
                 true // Editable
         ));
     }

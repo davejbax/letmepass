@@ -23,6 +23,10 @@ import uk.co.davidbaxter.letmepass.presentation.EntryDialogViewModel;
 import uk.co.davidbaxter.letmepass.security.PasswordGeneratorService;
 import uk.co.davidbaxter.letmepass.security.SecurityServices;
 
+/**
+ * A dialog to display or allow editing of {@link PasswordDatabaseEntryContainer} objects that hold
+ * entries.
+ */
 public class EntryDialogFragment extends DialogFragment {
 
     public static final String TAG_CONTAINER = "container";

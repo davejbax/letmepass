@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/** A folder entry in a password database, storing child entries */
 public class FolderEntry extends PasswordDatabaseEntry {
 
     public static final String TYPE = "folder";

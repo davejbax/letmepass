@@ -20,6 +20,9 @@ import java.util.Locale;
 import uk.co.davidbaxter.letmepass.R;
 import uk.co.davidbaxter.letmepass.model.PasswordFlags;
 
+/**
+ * A service for creating and updating {@link PasswordFlags}.
+ */
 public class PasswordFlagsService {
 
     /** File name of blacklist file when stored as a copy in the app storage */
