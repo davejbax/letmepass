@@ -62,6 +62,9 @@ dependencies {
     implementation 'org.bouncycastle:bcprov-jdk15on:1.59'
 //    implementation 'de.mkammerer:argon2-jvm:2.4'
 
+    // SQLJet for SQLite DB
+    implementation 'org.sqldroid:sqldroid:1.0.3'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'

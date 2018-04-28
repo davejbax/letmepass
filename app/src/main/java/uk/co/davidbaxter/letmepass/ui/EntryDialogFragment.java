@@ -46,13 +46,15 @@ public class EntryDialogFragment extends DialogFragment {
         // 'return value', but passed instead as a callback on the VM
         this.mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
 
+        // Initialize the security services for use in the viewmodel
+        SecurityServices.initialize(getContext().getApplicationContext());
+
         // Obtain our own view model to deal with our own presentation and actions; we need to
         // use a factory to get this,
         this.viewModel = ViewModelProviders
                 .of(this, new EntryDialogViewModel.Factory(
                         container,
-                        editable,
-                        SecurityServices.getInstance(getContext().getApplicationContext())))
+                        editable))
                 .get(EntryDialogViewModel.class);
 
         // Observe for close events, to close the dialog

@@ -4,16 +4,21 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
 import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordFlags;
 import uk.co.davidbaxter.letmepass.security.PasswordGeneratorService;
 import uk.co.davidbaxter.letmepass.security.SecurityServices;
+import uk.co.davidbaxter.letmepass.util.DebounceUtils;
 import uk.co.davidbaxter.letmepass.util.SingleLiveEvent;
 
 /**
@@ -21,6 +26,9 @@ import uk.co.davidbaxter.letmepass.util.SingleLiveEvent;
  * @see PasswordDatabaseEntry
  */
 public class EntryDialogViewModel extends ViewModel {
+
+    private static final String DEBOUNCE_KEY_FLAGS = "FLAGS";
+    private static final int DEBOUNCE_TIME_MS = 400;
 
     private static final DateFormat format = DateFormat.getDateTimeInstance();
 
@@ -64,24 +72,32 @@ public class EntryDialogViewModel extends ViewModel {
      */
     private final boolean startedAsEditable;
 
-    private final SecurityServices securityServices;
-
-    private EntryDialogViewModel(PasswordDatabaseEntryContainer container,
-                                 boolean editable,
-                                 SecurityServices securityServices) {
+    private EntryDialogViewModel(final PasswordDatabaseEntryContainer container,
+                                 boolean editable) {
         this.startedAsEditable = editable;
-        this.securityServices = securityServices;
         this.editable.setValue(editable);
         this.container = container;
         this.workingEntry.setValue((PasswordDatabaseEntry) container.getEntry().clone());
         this.passwordFlags.setValue(new PasswordFlags());
 
         // Initialize password flags for the current password
-        if (container.getEntry().getType().equals(PasswordEntry.TYPE))
-            CreationViewModel.generateFlags(
-                    this.passwordFlags.getValue(),
-                    ((PasswordEntry) container.getEntry()).password
-            );
+        if (container.getEntry().getType().equals(PasswordEntry.TYPE)) {
+            final PasswordFlags flagsInstance = this.passwordFlags.getValue();
+            final String pwd = ((PasswordEntry) this.container.getEntry()).password;
+
+            // Debounce with time 0 so that if the user types before this completes, it gets
+            // cancelled; also runs as async so UI not slowed
+            DebounceUtils.debounce(this, DEBOUNCE_KEY_FLAGS, 0, new Runnable() {
+                @Override
+                public void run() { // (Async method)
+                    // Update flags and post value to UI
+                    SecurityServices.getInstance()
+                            .getPasswordFlagsService()
+                            .updateFlags(flagsInstance, pwd);
+                    passwordFlags.postValue(flagsInstance);
+                }
+            });
+        }
     }
 
     /**
@@ -144,17 +160,24 @@ public class EntryDialogViewModel extends ViewModel {
         return format.format(date);
     }
 
-    public void onPasswordChanged(CharSequence newPassword, int start, int before, int count) {
+    public void onPasswordChanged(final CharSequence newPwd, int start, int before, int count) {
         // Retrieve or create flags
-        PasswordFlags flags = passwordFlags.getValue();
-        if (flags == null)
-            flags = new PasswordFlags();
+        final PasswordFlags flags = passwordFlags.getValue() == null ? new PasswordFlags()
+            : passwordFlags.getValue();
 
         // Get password and recalculate flags based on it
-        CreationViewModel.generateFlags(flags, newPassword.toString());
+        DebounceUtils.debounce(this, DEBOUNCE_KEY_FLAGS, DEBOUNCE_TIME_MS, new Runnable() {
+            @Override
+            public void run() {
+                // Update flags in a separate thread
+                SecurityServices.getInstance()
+                        .getPasswordFlagsService()
+                        .updateFlags(flags, newPwd.toString());
 
-        // Update flags in view
-        passwordFlags.postValue(flags);
+                // Post change to main UI thread
+                passwordFlags.postValue(flags);
+            }
+        });
     }
 
     public void onGeneratePassword() {
@@ -163,7 +186,9 @@ public class EntryDialogViewModel extends ViewModel {
             return;
 
         // Generate a new password
-        String pwd = securityServices.getPasswordGeneratorService()
+        String pwd = SecurityServices
+                .getInstance()
+                .getPasswordGeneratorService()
                 .getPasswordGenerator()
                 .generate();
 
@@ -234,14 +259,11 @@ public class EntryDialogViewModel extends ViewModel {
 
         private final PasswordDatabaseEntryContainer container;
         private final boolean editable;
-        private final SecurityServices securityServices;
 
         public Factory(PasswordDatabaseEntryContainer container,
-                       boolean editable,
-                       SecurityServices securityServices) {
+                       boolean editable) {
             this.container = container;
             this.editable = editable;
-            this.securityServices = securityServices;
         }
 
         @NonNull
@@ -252,7 +274,7 @@ public class EntryDialogViewModel extends ViewModel {
                         "Class must be instance of EntryDialogViewModel"
                 );
 
-            return (T) new EntryDialogViewModel(container, editable, securityServices);
+            return (T) new EntryDialogViewModel(container, editable);
         }
 
     }

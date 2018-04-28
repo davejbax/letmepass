@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.Pair;
 
+import java.security.Security;
 import java.util.Collections;
 import java.util.concurrent.Future;
 
@@ -15,6 +16,7 @@ import uk.co.davidbaxter.letmepass.model.PasswordDatabase;
 import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordFlags;
 import uk.co.davidbaxter.letmepass.model.impl.JsonPasswordDatabase;
+import uk.co.davidbaxter.letmepass.security.SecurityServices;
 import uk.co.davidbaxter.letmepass.session.SessionContext;
 import uk.co.davidbaxter.letmepass.session.SessionContextRegistry;
 import uk.co.davidbaxter.letmepass.session.impl.DefaultSessionContext;
@@ -25,6 +27,7 @@ import uk.co.davidbaxter.letmepass.model.impl.VersionedEncryptedDatabaseSerializ
 import uk.co.davidbaxter.letmepass.ui.CreationActivity;
 import uk.co.davidbaxter.letmepass.util.AsyncUtils;
 import uk.co.davidbaxter.letmepass.util.Consumer;
+import uk.co.davidbaxter.letmepass.util.DebounceUtils;
 import uk.co.davidbaxter.letmepass.util.SingleLiveEvent;
 
 public class CreationViewModel extends ViewModel {
@@ -33,6 +36,9 @@ public class CreationViewModel extends ViewModel {
     public static final int ID_STEP_2 = 2;
     public static final int ID_STEP_3 = 3;
     public static final int ID_STEP_4 = 4;
+
+    private static final String DEBOUNCE_KEY_FLAGS = "FLAGS";
+    private static final int DEBOUNCE_TIME_MS = 400;
 
     /**
      * A live event to signal to the view that it should open dialogs to choose files. If the
@@ -104,16 +110,25 @@ public class CreationViewModel extends ViewModel {
         // TODO
     }
 
-    public void onMpChanged(CharSequence s, int start, int before, int count) {
-        // TODO: temporary code here to give a prototype; actual code will call a Service
-        PasswordFlags pwdFlags = passwordFlags.getValue();
-        if (pwdFlags == null)
-            pwdFlags = new PasswordFlags();
+    public void onMpChanged(final CharSequence s, int start, int before, int count) {
+        final PasswordFlags pwdFlags = passwordFlags.getValue() == null ? new PasswordFlags() :
+                passwordFlags.getValue();
 
-        generateFlags(pwdFlags, s.toString());
+        // Debounce to avoid superfluous calls to flags (async)
+        DebounceUtils.debounce(this, DEBOUNCE_KEY_FLAGS, DEBOUNCE_TIME_MS, new Runnable() {
+            @Override
+            public void run() {
+                // If no security services instance, just return
+                if (SecurityServices.getInstance() == null)
+                    return;
 
-        // Re-set passwordFlags LiveData so UI updates
-        passwordFlags.setValue(pwdFlags);
+                // Update the password flags with the new master password, posting result to UI
+                SecurityServices.getInstance()
+                        .getPasswordFlagsService()
+                        .updateFlags(pwdFlags, s.toString());
+                passwordFlags.postValue(pwdFlags);
+            }
+        });
     }
 
     public void onDriveCreated(DriveDataStore store) {
@@ -246,43 +261,6 @@ public class CreationViewModel extends ViewModel {
             return Pair.create(R.string.creation_error_mp_again_wrong, new Object[] {});
         }
         return null;
-    }
-
-    public static void generateFlags(PasswordFlags flags, String password) {
-        // TODO: remove this temp function; will be implemented by a service in practice
-        // Working booleans from which to set the password flags
-        boolean numbers = false;
-        boolean upper = false;
-        boolean lower = false;
-        boolean symbols = false;
-
-        // Iterate over characters to check whether containing certain chars
-        for (int i = 0; i < password.length(); i++) {
-            char c = password.charAt(i);
-            if ((c >= 32 && c <= 47)
-                    || (c >= 58 && c <= 64)
-                    || (c >= 91 && c <= 96)
-                    || (c >= 123 && c <= 126))
-                symbols = true;
-            if (c >= 97 && c <= 122)
-                lower = true;
-            if (c >= 65 && c <= 90)
-                upper = true;
-            if (c >= 48 && c <= 57)
-                numbers = true;
-        }
-
-        // Set good length
-        flags.goodLength = password.length() >= 12;
-
-        // Set mixed chars
-        flags.hasMixedChars = upper && lower && numbers;
-
-        // Set symbols
-        flags.hasSymbols = symbols;
-
-        // Set blacklisted
-        flags.notBlacklisted = true;
     }
 
 }

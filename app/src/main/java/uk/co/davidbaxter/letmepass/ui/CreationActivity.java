@@ -21,9 +21,11 @@ import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
 
 import java.io.IOException;
+import java.security.Security;
 
 import uk.co.davidbaxter.letmepass.R;
 import uk.co.davidbaxter.letmepass.presentation.CreationViewModel;
+import uk.co.davidbaxter.letmepass.security.SecurityServices;
 import uk.co.davidbaxter.letmepass.storage.impl.DriveStorageService;
 import uk.co.davidbaxter.letmepass.storage.impl.FileDataStore;
 import uk.co.davidbaxter.letmepass.storage.impl.FileStorageService;
@@ -44,6 +46,10 @@ public class CreationActivity extends AppCompatActivity implements StepperLayout
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_creation);
 
+        // Initialize security services for viewmodel
+        SecurityServices.initialize(getApplicationContext());
+
+        // Initialize VM
         this.viewModel = ViewModelProviders.of(this).get(CreationViewModel.class);
 
         // Setup stepper layout
