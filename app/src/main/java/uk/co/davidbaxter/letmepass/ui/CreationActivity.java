@@ -1,5 +1,6 @@
 package uk.co.davidbaxter.letmepass.ui;
 
+import android.Manifest;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
@@ -10,9 +11,11 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
@@ -24,6 +27,7 @@ import java.io.IOException;
 import java.security.Security;
 
 import uk.co.davidbaxter.letmepass.R;
+import uk.co.davidbaxter.letmepass.presentation.BreachAction;
 import uk.co.davidbaxter.letmepass.presentation.CreationViewModel;
 import uk.co.davidbaxter.letmepass.security.SecurityServices;
 import uk.co.davidbaxter.letmepass.storage.impl.DriveStorageService;
@@ -35,6 +39,7 @@ public class CreationActivity extends AppCompatActivity implements StepperLayout
     private static final String TAG = "CreationActivity";
     private static final int REQUEST_SIGN_IN_AND_CREATE = 1;
     private static final int REQUEST_CREATE = 2;
+    private static final int REQUEST_PERM_REQUEST_THEN_BREACH_CHECK = 3;
 
     private CreationViewModel viewModel;
     private StepperLayout stepper;
@@ -101,6 +106,11 @@ public class CreationActivity extends AppCompatActivity implements StepperLayout
                 // Hide progress if we were waiting on this intent
                 this.stepper.hideProgress();
                 break;
+
+            case REQUEST_PERM_REQUEST_THEN_BREACH_CHECK:
+                // If result was successful, carry out the breach check
+                if (resultCode == RESULT_OK)
+                    viewModel.onBreachCheck();
         }
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -204,6 +214,8 @@ public class CreationActivity extends AppCompatActivity implements StepperLayout
             }
         });
 
+        // Listen for signals by viewmodel to launch main activity, or indicate failure to create
+        // the DB
         this.viewModel.getCreateResult().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean successful) {
@@ -219,6 +231,16 @@ public class CreationActivity extends AppCompatActivity implements StepperLayout
                             Toast.LENGTH_LONG)
                         .show();
                 }
+            }
+        });
+
+        // Listen for signals to relay breach check result to user or perform other BreachActions
+        this.viewModel.getBreachActionEvent().observe(this,
+                new Observer<Pair<BreachAction, Object>>() {
+            @Override
+            public void onChanged(@Nullable Pair<BreachAction, Object> value) {
+                BreachCheckCommon.handleBreachCheck(
+                        CreationActivity.this, value, REQUEST_PERM_REQUEST_THEN_BREACH_CHECK);
             }
         });
     }

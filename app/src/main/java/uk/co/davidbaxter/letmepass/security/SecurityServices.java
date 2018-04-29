@@ -11,10 +11,12 @@ public class SecurityServices {
     private static SecurityServices instance;
     private final PasswordGeneratorService passwordGeneratorService;
     private final PasswordFlagsService passwordFlagsService;
+    private final PasswordBreachService passwordBreachService;
 
     public SecurityServices(Context context) {
         this.passwordGeneratorService = new PasswordGeneratorService(context);
         this.passwordFlagsService = new PasswordFlagsService(context);
+        this.passwordBreachService = new PasswordBreachService(context);
     }
 
     /**
@@ -31,6 +33,14 @@ public class SecurityServices {
      */
     public PasswordFlagsService getPasswordFlagsService() {
         return passwordFlagsService;
+    }
+
+    /**
+     * Gets the {@link PasswordBreachService} instance
+     * @return Password breach service
+     */
+    public PasswordBreachService getPasswordBreachService() {
+        return passwordBreachService;
     }
 
     /**

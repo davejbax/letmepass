@@ -16,6 +16,7 @@ import uk.co.davidbaxter.letmepass.model.PasswordDatabase;
 import uk.co.davidbaxter.letmepass.model.PasswordDatabaseEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordFlags;
 import uk.co.davidbaxter.letmepass.model.impl.JsonPasswordDatabase;
+import uk.co.davidbaxter.letmepass.security.PasswordBreachService;
 import uk.co.davidbaxter.letmepass.security.SecurityServices;
 import uk.co.davidbaxter.letmepass.session.SessionContext;
 import uk.co.davidbaxter.letmepass.session.SessionContextRegistry;
@@ -24,6 +25,7 @@ import uk.co.davidbaxter.letmepass.storage.DataStore;
 import uk.co.davidbaxter.letmepass.storage.impl.DriveDataStore;
 import uk.co.davidbaxter.letmepass.storage.impl.FileDataStore;
 import uk.co.davidbaxter.letmepass.model.impl.VersionedEncryptedDatabaseSerializer;
+import uk.co.davidbaxter.letmepass.ui.BreachCheckCommon;
 import uk.co.davidbaxter.letmepass.ui.CreationActivity;
 import uk.co.davidbaxter.letmepass.util.AsyncUtils;
 import uk.co.davidbaxter.letmepass.util.Consumer;
@@ -54,6 +56,12 @@ public class CreationViewModel extends ViewModel {
      */
     private SingleLiveEvent<Boolean> createResult = new SingleLiveEvent<>();
 
+    /**
+     * A live event to signal to the view that the action to take relating to the 'check breaches'
+     * functionality has changed. The value of this is a pair of the action and any action params
+     */
+    private SingleLiveEvent<Pair<BreachAction, Object>> breachActionEvent = new SingleLiveEvent<>();
+
     // Bound fields: these are set by the view, and can be read/set by us
     public MutableLiveData<String> masterPassword = new MutableLiveData<>();
     public MutableLiveData<String> masterPasswordAgain = new MutableLiveData<>(); // Re-entry of mp
@@ -67,6 +75,7 @@ public class CreationViewModel extends ViewModel {
     public MutableLiveData<String> deviceLocation = new MutableLiveData<>();
     public MutableLiveData<String> keyfileLocation = new MutableLiveData<>();
     public MutableLiveData<PasswordFlags> passwordFlags = new MutableLiveData<>();
+    public MutableLiveData<Boolean> checkingBreaches = new MutableLiveData<>();
 
     // Parameters from which to construct session
     private DataStore cloudDataStore = null;
@@ -100,6 +109,16 @@ public class CreationViewModel extends ViewModel {
         return createResult;
     }
 
+    /**
+     * Gets the LiveData representing the current 'breach action' event. This is an action that the
+     * view must carry out related to the 'breach check' functionality.
+     * @return LiveData of pair of breach action to take and action parameters
+     * @see BreachAction
+     */
+    public LiveData<Pair<BreachAction, Object>> getBreachActionEvent() {
+        return breachActionEvent;
+    }
+
     public void onOpenCloud() {
         chooseStorageEvent.postValue(true);
     }
@@ -109,11 +128,40 @@ public class CreationViewModel extends ViewModel {
     }
 
     public void onBreachCheck() {
-        // TODO
+        // If master password is empty, OR we are currently checking a password, don't do anything
+        if (masterPassword.getValue() == null || masterPassword.getValue().isEmpty()
+                || (checkingBreaches.getValue() != null && checkingBreaches.getValue()))
+            return;
+
+        // Stop user from spamming the button
+        checkingBreaches.postValue(true);
+
+        // Check breaches asynchronously
+        Future<Integer> breachesFuture = SecurityServices.getInstance()
+                .getPasswordBreachService()
+                .checkBreaches(masterPassword.getValue());
+
+        // Process result asynchronously
+        AsyncUtils.futureToTask(breachesFuture, new Consumer<Integer>() {
+            @Override
+            public void accept(Integer result) {
+                // Update the view with new action
+                breachActionEvent.postValue(BreachAction.getPairFromBreachCheckResult(result));
+
+                // Allow user to check breaches again
+                checkingBreaches.postValue(false);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.e(CreationViewModel.class.getSimpleName(), "Failed to do breach check", t);
+                checkingBreaches.postValue(false);
+            }
+        }).execute();
     }
 
     public void onBreachCheckHelp() {
-        // TODO
+        breachActionEvent.postValue(Pair.create(BreachAction.EXPLAIN, null));
     }
 
     public void onGenKeyfile() {

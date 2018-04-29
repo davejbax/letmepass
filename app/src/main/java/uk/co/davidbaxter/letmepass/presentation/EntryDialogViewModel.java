@@ -6,10 +6,13 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.util.Log;
+import android.util.Pair;
 
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
@@ -18,6 +21,8 @@ import uk.co.davidbaxter.letmepass.model.PasswordEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordFlags;
 import uk.co.davidbaxter.letmepass.security.PasswordGeneratorService;
 import uk.co.davidbaxter.letmepass.security.SecurityServices;
+import uk.co.davidbaxter.letmepass.util.AsyncUtils;
+import uk.co.davidbaxter.letmepass.util.Consumer;
 import uk.co.davidbaxter.letmepass.util.DebounceUtils;
 import uk.co.davidbaxter.letmepass.util.SingleLiveEvent;
 
@@ -46,6 +51,13 @@ public class EntryDialogViewModel extends ViewModel {
      * Live event to signal to observer(s) to save a container
      */
     private SingleLiveEvent<PasswordDatabaseEntryContainer> saveEvent = new SingleLiveEvent<>();
+
+    /**
+     * Live event signalling that some action relating to the breach check has taken place;
+     * Pair is breach action and any parameter that the action takes
+     * @see BreachAction
+     */
+    private SingleLiveEvent<Pair<BreachAction, Object>> breachActionEvent = new SingleLiveEvent<>();
 
     /**
      * Live data of working entry -- this is one that is a deep copy of the actual entry held in the
@@ -128,6 +140,15 @@ public class EntryDialogViewModel extends ViewModel {
     }
 
     /**
+     * Gets an event that signals when an action relating to the password breach check functionality
+     * must be processed.
+     * @return Live pair of breach action to process and (possibly null) parameter of the action
+     */
+    public LiveData<Pair<BreachAction, Object>> getBreachActionEvent() {
+        return this.breachActionEvent;
+    }
+
+    /**
      * Gets the current working entry as live data. This is an entry that can be modified with
      * changes. These changes will be committed when calling {@link #onSave()}.
      * @return Current working entry live data
@@ -202,6 +223,35 @@ public class EntryDialogViewModel extends ViewModel {
         return this.editable.getValue() != null
                 && this.editable.getValue()
                 && this.container.getEntry().getType().equals(PasswordEntry.TYPE);
+    }
+
+    public void onBreachCheck() {
+        if (this.workingEntry.getValue() == null
+                || !this.workingEntry.getValue().getType().equals(PasswordEntry.TYPE)
+                || ((PasswordEntry) this.workingEntry.getValue()).password.isEmpty())
+            return;
+
+        // Get working entry password (if we're editing, this is suited; if we're viewing, it
+        // is equivalent to the saved entry)
+        String password = ((PasswordEntry) this.workingEntry.getValue()).password;
+
+        // Check breaches asynchronously
+        Future<Integer> futureBreaches = SecurityServices.getInstance()
+                .getPasswordBreachService()
+                .checkBreaches(password);
+
+        // Asynchronously process the result and emit event on result
+        AsyncUtils.futureToTask(futureBreaches, new Consumer<Integer>() {
+            @Override
+            public void accept(Integer result) {
+                breachActionEvent.postValue(BreachAction.getPairFromBreachCheckResult(result));
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.e(EntryDialogViewModel.class.getSimpleName(), "Failed to check breaches", t);
+            }
+        }).execute();
     }
 
     /**

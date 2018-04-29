@@ -51,6 +51,7 @@
     <string name="creation_flags_explanation">Security recommendation:</string>
     <string name="creation_mp_hint">Master password</string>
     <string name="creation_breach_check">Check Breaches</string>
+    <string name="creation_breach_checking">Checking...</string>
     <string name="creation_gen_keyfile">Generate Keyfile</string>
     <string name="creation_keyfile_continue">
         If you do not wish to create a keyfile, tap \'Next\'
@@ -156,6 +157,7 @@
     <string name="entry_dialog_cancel_btn">Cancel</string>
     <string name="entry_dialog_close_btn">Close</string>
     <string name="entry_dialog_generate_btn">Generate password</string>
+    <string name="entry_dialog_breach_check">Check breaches</string>
 
     <string name="label_entry_name">Name</string>
     <string name="hint_entry_name">Name</string>
@@ -178,6 +180,26 @@
     <string name="label_entry_data">Data</string>
     <string name="hint_entry_data">Enter text data here</string>
     <string name="label_entry_flags">Password strength</string>
+
+    <!-- Password breach check service -->
+    <string name="breach_server_error">Failed to connect to server; service may be down</string>
+    <string name="breach_io_exception">Failed to get breaches; is the internet connected?</string>
+    <string name="breach_unknown_error">An unknown error occurred</string>
+    <string name="breach_help_title">What is breach check?</string>
+    <string name="breach_help_message">
+        Breach check allows you to check securely whether your password has appeared in any breaches
+        of online services. If has appeared in a breach, it is unsafe to use, as an attacker could
+        easily guess it!
+    </string>
+    <string name="breach_help_button">OK</string>
+    <string name="breach_result_title">Breach check</string>
+    <string name="breach_result_breached_message">
+        Password is compromised! It was found in %1$d breaches.
+    </string>
+    <string name="breach_result_safe_message">
+        Password secure! It was found in %1$d breaches.
+    </string>
+    <string name="breach_result_button">OK</string>
 
     <!-- Google Drive -->
     <string name="drive_sign_in_cancelled">To use cloud storage, you must sign in with Google</string>

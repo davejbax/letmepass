@@ -39,4 +39,8 @@
 
     </application>
 
+    <uses-permission
+        android:name="android.permission.INTERNET"
+        android:required="false" />
+
 </manifest>

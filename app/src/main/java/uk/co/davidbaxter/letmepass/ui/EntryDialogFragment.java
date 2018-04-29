@@ -2,11 +2,13 @@ package uk.co.davidbaxter.letmepass.ui;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +19,14 @@ import uk.co.davidbaxter.letmepass.databinding.FragmentEntryDialogBinding;
 import uk.co.davidbaxter.letmepass.model.DataEntry;
 import uk.co.davidbaxter.letmepass.model.FolderEntry;
 import uk.co.davidbaxter.letmepass.model.PasswordEntry;
+import uk.co.davidbaxter.letmepass.presentation.BreachAction;
 import uk.co.davidbaxter.letmepass.presentation.MainViewModel;
 import uk.co.davidbaxter.letmepass.presentation.PasswordDatabaseEntryContainer;
 import uk.co.davidbaxter.letmepass.presentation.EntryDialogViewModel;
 import uk.co.davidbaxter.letmepass.security.PasswordGeneratorService;
 import uk.co.davidbaxter.letmepass.security.SecurityServices;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A dialog to display or allow editing of {@link PasswordDatabaseEntryContainer} objects that hold
@@ -32,13 +37,31 @@ public class EntryDialogFragment extends DialogFragment {
     public static final String TAG_CONTAINER = "container";
     public static final String TAG_EDITABLE = "editable";
 
+    private static final int REQUEST_PERM_REQUEST_THEN_BREACH_CHECK = 1;
+
     private MainViewModel mainViewModel;
     private EntryDialogViewModel viewModel;
     private PasswordDatabaseEntryContainer container;
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_PERM_REQUEST_THEN_BREACH_CHECK:
+                // If the permission was accepted successfully, re-carry out the breach check
+                if (resultCode == RESULT_OK)
+                    viewModel.onBreachCheck();
+                break;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Initialize the security services for use in the viewmodel
+        SecurityServices.initialize(getContext().getApplicationContext());
 
         // Get arguments
         this.container = (PasswordDatabaseEntryContainer)
@@ -49,9 +72,6 @@ public class EntryDialogFragment extends DialogFragment {
         // any changes that take place within this fragment to the main screen - similar to a
         // 'return value', but passed instead as a callback on the VM
         this.mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-
-        // Initialize the security services for use in the viewmodel
-        SecurityServices.initialize(getContext().getApplicationContext());
 
         // Obtain our own view model to deal with our own presentation and actions; we need to
         // use a factory to get this,
@@ -75,6 +95,16 @@ public class EntryDialogFragment extends DialogFragment {
             @Override
             public void onChanged(@Nullable PasswordDatabaseEntryContainer container) {
                 mainViewModel.getEntryCallbacks().saveEntry(container);
+            }
+        });
+
+        // Observe for breach check events
+        this.viewModel.getBreachActionEvent().observe(this,
+                new Observer<Pair<BreachAction, Object>>() {
+            @Override
+            public void onChanged(@Nullable Pair<BreachAction, Object> value) {
+                BreachCheckCommon.handleBreachCheck(getActivity(), value,
+                        REQUEST_PERM_REQUEST_THEN_BREACH_CHECK);
             }
         });
     }
