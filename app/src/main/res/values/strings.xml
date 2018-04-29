@@ -158,6 +158,8 @@
     <string name="entry_dialog_close_btn">Close</string>
     <string name="entry_dialog_generate_btn">Generate password</string>
     <string name="entry_dialog_breach_check">Check breaches</string>
+    <string name="entry_dialog_name_empty">Please choose an entry name</string>
+    <string name="entry_dialog_password_empty">Please enter a password</string>
 
     <string name="label_entry_name">Name</string>
     <string name="hint_entry_name">Name</string>

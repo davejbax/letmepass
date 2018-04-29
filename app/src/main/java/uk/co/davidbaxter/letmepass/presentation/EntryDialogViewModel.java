@@ -67,8 +67,13 @@ public class EntryDialogViewModel extends ViewModel {
      */
     private MutableLiveData<PasswordDatabaseEntry> workingEntry = new MutableLiveData<>();
 
-    private MutableLiveData<PasswordFlags> passwordFlags =
-            new MutableLiveData<>();
+    /**
+     * Current password flags; view should be bound to this to update UI with new flags, e.g.
+     */
+    private MutableLiveData<PasswordFlags> passwordFlags = new MutableLiveData<>();
+
+    /**/
+    private MutableLiveData<ValidationError> validationError = new MutableLiveData<>();
 
     /**
      * Container holding the original entry to be edited. The entry held in this container need not
@@ -127,6 +132,14 @@ public class EntryDialogViewModel extends ViewModel {
      */
     public LiveData<Void> getCloseEvent() {
         return this.closeEvent;
+    }
+
+    /**
+     * Gets the current validation error that should be displayed
+     * @return Validation error live data
+     */
+    public LiveData<ValidationError> getValidationError() {
+        return validationError;
     }
 
     /**
@@ -266,7 +279,19 @@ public class EntryDialogViewModel extends ViewModel {
      * (i.e. not editable).
      */
     public void onSave() {
-        // TODO: validate
+        // Validate: we can't have a blank entry name
+        if (this.workingEntry.getValue() == null
+            || this.workingEntry.getValue().name.isEmpty()) {
+            validationError.postValue(ValidationError.ENTRY_NAME_BLANK);
+            return;
+        // Validate: password should not be blank
+        } else if (this.container.getEntry().getType().equals(PasswordEntry.TYPE)
+                && ((PasswordEntry) this.workingEntry.getValue()).password.isEmpty()) {
+            validationError.postValue(ValidationError.PASSWORD_BLANK);
+            return;
+        }
+
+        this.validationError.postValue(null);
 
         // Update the container's entry with our working entry, 'saving' our changes to it.
         this.container.getEntry().fromCopy(this.workingEntry.getValue());
@@ -327,6 +352,11 @@ public class EntryDialogViewModel extends ViewModel {
             return (T) new EntryDialogViewModel(container, editable);
         }
 
+    }
+
+    public enum ValidationError {
+        ENTRY_NAME_BLANK,
+        PASSWORD_BLANK
     }
 
 }

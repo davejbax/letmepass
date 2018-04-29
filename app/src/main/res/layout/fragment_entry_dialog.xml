@@ -39,20 +39,27 @@
                 app:imageResource="@{viewModel.getIconId()}" />
 
             <!-- Title of entry -->
-            <EditText
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/editLayoutEntryName"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/view_padding"
                 android:layout_weight="1"
-                android:enabled="@{viewModel.getEditable()}"
-                android:hint="@string/hint_entry_name"
-                android:text="@={entry.name}"
-                tools:text="Entry Name"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:inputType="text"
-                android:background="@null" />
+                android:layout_height="wrap_content"
+                app:hintEnabled="false">
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginLeft="@dimen/view_padding"
+                    android:enabled="@{viewModel.getEditable()}"
+                    android:hint="@string/hint_entry_name"
+                    android:text="@={entry.name}"
+                    tools:text="Entry Name"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:inputType="text"
+                    android:background="@null" />
+            </android.support.design.widget.TextInputLayout>
 
             <!-- Indicator of whether we are editing or viewing -->
             <TextView

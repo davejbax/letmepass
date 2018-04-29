@@ -43,6 +43,7 @@ import uk.co.davidbaxter.letmepass.presentation.DisplayMode;
 import uk.co.davidbaxter.letmepass.presentation.MainViewModel;
 import uk.co.davidbaxter.letmepass.presentation.PasswordDatabaseEntryContainer;
 import uk.co.davidbaxter.letmepass.presentation.SortingCriteria;
+import uk.co.davidbaxter.letmepass.security.SecurityServices;
 import uk.co.davidbaxter.letmepass.util.Triplet;
 
 public class MainActivity extends AppCompatActivity implements
@@ -65,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Initialize security services
+        SecurityServices.initialize(getApplicationContext());
 
         // Set whether we are a large screen/device or not
         this.largeScreen = getResources().getBoolean(R.bool.large_layout);

@@ -7,6 +7,7 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -129,7 +130,7 @@ public class EntryDialogFragment extends DialogFragment {
         containerGroup.removeAllViews();
 
         // Inflate the child view, and attach it to the editor container
-        ViewDataBinding childBinding = DataBindingUtil.inflate(
+        final ViewDataBinding childBinding = DataBindingUtil.inflate(
                 inflater,
                 getChildLayoutId(),
                 containerGroup,
@@ -142,6 +143,48 @@ public class EntryDialogFragment extends DialogFragment {
         childBinding.setLifecycleOwner(this);
         childBinding.setVariable(BR.entry, this.viewModel.getWorkingEntry());
         childBinding.setVariable(BR.viewModel, this.viewModel);
+
+        // Observe for validation errors
+        this.viewModel.getValidationError().observe(this, new Observer<EntryDialogViewModel.ValidationError>() {
+            @Override
+            public void onChanged(@Nullable EntryDialogViewModel.ValidationError validationError) {
+                TextInputLayout nameInput = (TextInputLayout)
+                        root.findViewById(R.id.editLayoutEntryName);
+                TextInputLayout passwordInput = null;
+
+                // Check to see if we're editing a password
+                if (EntryDialogFragment.this.container.getEntry().getType().equals(
+                        PasswordEntry.TYPE)) {
+                    // Set password input layout if we have one
+                    passwordInput = (TextInputLayout) childBinding.getRoot().findViewById(
+                            R.id.editLayoutEntryPassword);
+                }
+
+                // If we have a null error, clear the error
+                if (validationError == null) {
+                    nameInput.setError(null);
+                    nameInput.setErrorEnabled(false);
+                    if (passwordInput != null) {
+                        passwordInput.setError(null);
+                        passwordInput.setErrorEnabled(false);
+                    }
+                    return;
+                }
+
+                switch (validationError) {
+                    case ENTRY_NAME_BLANK:
+                        nameInput.setErrorEnabled(true);
+                        nameInput.setError(getString(R.string.entry_dialog_name_empty));
+                        break;
+                    case PASSWORD_BLANK:
+                        if (passwordInput == null)
+                            break;
+                        passwordInput.setErrorEnabled(true);
+                        passwordInput.setError(getString(R.string.entry_dialog_password_empty));
+                        break;
+                }
+            }
+        });
 
         return root;
     }
