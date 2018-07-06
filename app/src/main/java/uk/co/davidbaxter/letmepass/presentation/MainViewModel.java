@@ -62,6 +62,10 @@ public class MainViewModel extends ViewModel {
      */
     final MutableLiveData<Pair<Integer, Object[]>> screenTitle = new MutableLiveData<>();
 
+    /**
+     * A live boolean representing whether the user can currently go back in the view; this could
+     * be used, e.g., for visual indications that the user can go back (e.g. a back arrow)
+     */
     final MutableLiveData<Boolean> canGoBack = new MutableLiveData<>();
 
     /**
@@ -89,8 +93,14 @@ public class MainViewModel extends ViewModel {
      */
     final SingleLiveEvent<String> copyToClipboard = new SingleLiveEvent<>();
 
+    /**
+     * An event indicating that the view should close the activity
+     */
     final SingleLiveEvent<Void> closeEvent = new SingleLiveEvent<>();
 
+    /**
+     * An event indicating that the view should show a snackbar message
+     */
     final SingleLiveEvent<Pair<Integer, Object[]>> snackBarMessage = new SingleLiveEvent<>();
 
     //________________________________INTERNALS________________________________
@@ -99,22 +109,20 @@ public class MainViewModel extends ViewModel {
      */
     DisplayMode currentMode = DisplayMode.EXPLORE;
 
-    // TODO: replace with real model
+    /**
+     * The password database itself
+     */
     PasswordDatabase database;
-//    JsonPasswordDatabase database = new JsonPasswordDatabase("DB Name",
-//            Arrays.asList(
-//                    new PasswordEntry("Netflix", "johnsmith", "badpass", "http://netflix.com", ""),
-//                    new PasswordEntry("Facebook", "johnsmith", "badpass", "http://facebook.com", ""),
-//                    new PasswordEntry("Twitter", "@johnsmith", "badpass", "http://twitter.com", ""),
-//                    new DataEntry("Banking Details", "Account no: 1234567890"),
-//                    new FolderEntry("School", Arrays.<PasswordDatabaseEntry>asList(
-//                            new PasswordEntry("School login", "11jsmith", "badpass1", "", "")
-//                    ))
-//            ));
 
+    /**
+     * Navigator of the password database
+     */
     PasswordDatabaseNavigator navigator;
 
-    SessionContext sessionContext;
+    /**
+     * Session context holding state for the current database context (e.g. DataStore, for storage)
+     */
+    private final SessionContext sessionContext;
 
     /**
      * List of containers of password entries -- these are transformed from model-returned password
@@ -152,6 +160,8 @@ public class MainViewModel extends ViewModel {
         this.entries.postValue(this.database.getRootEntries());
         this.stuckContainer.setValue(new PasswordDatabaseEntryContainer(R.string.main_divider_passwords));
     }
+
+    //________________________________GETTERS________________________________
 
     /**
      * Get the list of containers to display in the view
@@ -191,22 +201,43 @@ public class MainViewModel extends ViewModel {
         return dialog;
     }
 
+    /**
+     * Gets the LiveData event for updating a single container in the view.
+     * @return (Live) container to update
+     */
     public LiveData<PasswordDatabaseEntryContainer> getContainerUpdate() {
         return updateContainer;
     }
 
+    /**
+     * Gets the LiveData representing whether user can currently go back (e.g. due to being in a
+     * folder)
+     * @return Whether the user can go back as a LiveData object
+     */
     public LiveData<Boolean> getCanGoBack() {
         return canGoBack;
     }
 
+    /**
+     * Gets the live event for copying data to the clipboard; given value is the string to copy.
+     * @return LiveData emitting strings to copy to clipboard
+     */
     public LiveData<String> getCopyToClipboard() {
         return this.copyToClipboard;
     }
 
+    /**
+     * Gets the live event indicating that the view should close the database
+     * @return Close event
+     */
     public LiveData<Void> getCloseEvent() {
         return closeEvent;
     }
 
+    /**
+     * Gets the live event emitting snackbar messages to display in the view
+     * @return LiveData emitting Pair of string resource ID and format parameters
+     */
     public LiveData<Pair<Integer, Object[]>> getSnackBarMessage() {
         return snackBarMessage;
     }
@@ -226,6 +257,8 @@ public class MainViewModel extends ViewModel {
     public MainSortingCallbacks getSortingCallbacks() {
         return sortingCallbacks;
     }
+
+    //________________________________PUBLIC CALLBACKS________________________________
 
     /**
      * Updates the 'stuck' divider. This is a divider shown at the top of the screen, which stays
@@ -258,6 +291,13 @@ public class MainViewModel extends ViewModel {
             this.stuckContainer.postValue(NULL_DIVIDER_CONTAINER);
     }
 
+    public void onFinish() {
+        SessionContextRegistry.discardSessionContext();
+    }
+
+    //________________________________PACKAGE METHODS________________________________
+    //                          (used by callback classes)
+
     /**
      * 'Refreshes' the view by re-setting title appropriately, re-fetching entries from the model,
      * and updating the list of displayed entries.
@@ -265,7 +305,7 @@ public class MainViewModel extends ViewModel {
      * Note that this method will replace search results if the displayed screen is currently search
      * results, instead returning to whatever mode was selected before search.
      */
-    public void refreshView() {
+    void refreshView() {
         switch (this.currentMode) {
             case EXPLORE:
                 int stringId = navigator.isAtRoot() ? R.string.main_title_explore
@@ -295,7 +335,7 @@ public class MainViewModel extends ViewModel {
         }
     }
 
-    public void saveDatabase() {
+    void saveDatabase() {
         // TODO: consider here whether database ref gets modified during saving: what then?
         // Deep copy instead? Locks? Synchronized?
         Future<Void> saveFuture = this.sessionContext.encryptAndSaveDb();
@@ -317,9 +357,7 @@ public class MainViewModel extends ViewModel {
         }).execute();
     }
 
-    public void onFinish() {
-        SessionContextRegistry.discardSessionContext();
-    }
+    //________________________________INTERNAL METHODS________________________________
 
     /**
      * Transforms a LiveData of a list of password database entries (raw from the model) into a list
