@@ -2,7 +2,7 @@
 
 Android password manager with a modern UI and cloud storage (via Google Drive) support
 
-<a href="/davejbax/letmepass/blob/master/screenshots/intro-screen.png"><img width="250" src="/davejbax/letmepass/raw/master/screenshots/intro-screen.png" alt="Intro screen" /></a> <a href="/davejbax/letmepass/blob/master/screenshots/creation-step-1.png"><img width="250" src="/davejbax/letmepass/raw/master/screenshots/creation-step-1.png" alt="Creation screen" /></a> <a href="/davejbax/letmepass/blob/master/screenshots/main-list.png"><img width="250" src="/davejbax/letmepass/raw/master/screenshots/main-list.png" alt="Passwords screen" /></a>
+<a href="screenshots/intro-screen.png"><img width="250" src="screenshots/intro-screen.png" alt="Intro screen" /></a> <a href="screenshots/creation-step-1.png"><img width="250" src="screenshots/creation-step-1.png" alt="Creation screen" /></a> <a href="screenshots/main-list.png"><img width="250" src="screenshots/main-list.png" alt="Passwords screen" /></a>
 
 ### Why?
 This project was initially developed as part of coursework for an A-level in Computer Science. The aim of the project was to create a modern, free, open source password manager that resolved some of the gripes that I had with existing solutions, such as: dated and difficult-to-use UI; weak or unexplicated encryption routines; no/limited mobile support; and no free cloud storage support.
@@ -24,12 +24,12 @@ LetMePass links in with Google Drive to allow for automatic backup and persisten
 - Argon2 (winner of the Password Hashing Competition) used to derive keys for encryption from passwords
 
 ### Screenshots
-<a href="/davejbax/letmepass/blob/master/screenshots/intro-screen.png"><img width="250" src="/davejbax/letmepass/raw/master/screenshots/intro-screen.png" alt="Intro screen" /></a>
-<a href="/davejbax/letmepass/blob/master/screenshots/creation-step-1.png"><img width="250" src="/davejbax/letmepass/raw/master/screenshots/creation-step-1.png" alt="Creation screen step 1" /></a>
-<a href="/davejbax/letmepass/blob/master/screenshots/creation-step-2.png"><img width="250" src="/davejbax/letmepass/raw/master/screenshots/creation-step-2.png" alt="Creation screen step 2" /></a>
-<a href="/davejbax/letmepass/blob/master/screenshots/main-list.png"><img width="250" src="/davejbax/letmepass/raw/master/screenshots/main-list.png" alt="Passwords screen" /></a>
-<a href="/davejbax/letmepass/blob/master/screenshots/main-password.png"><img width="250" src="/davejbax/letmepass/raw/master/screenshots/main-password.png" alt="Password viewing screen" /></a>
-<a href="/davejbax/letmepass/blob/master/screenshots/main-search.png"><img width="250" src="/davejbax/letmepass/raw/master/screenshots/main-search.png" alt="Search functionality" /></a>
+<a href="screenshots/intro-screen.png"><img width="250" src="screenshots/intro-screen.png" alt="Intro screen" /></a>
+<a href="screenshots/creation-step-1.png"><img width="250" src="screenshots/creation-step-1.png" alt="Creation screen step 1" /></a>
+<a href="screenshots/creation-step-2.png"><img width="250" src="screenshots/creation-step-2.png" alt="Creation screen step 2" /></a>
+<a href="screenshots/main-list.png"><img width="250" src="screenshots/main-list.png" alt="Passwords screen" /></a>
+<a href="screenshots/main-password.png"><img width="250" src="screenshots/main-password.png" alt="Password viewing screen" /></a>
+<a href="screenshots/main-search.png"><img width="250" src="screenshots/main-search.png" alt="Search functionality" /></a>
 
 ### Development Progress
 The app is not fully complete (as evidenced by the 'TODOs' in the codebase). Most features are implemented, but currently several features that are somewhat integral to everyday use are lacking, including settings (i.e. changing app and database settings), auto-loading databases on app launch, and database locking on app minimize.
